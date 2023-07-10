@@ -184,6 +184,8 @@ sub vcl_recv {
      error 801 "Force SSL";
   }
 
+  ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
+
   # Serve from stale for 24 hours if origin is sick
   set req.grace = 24h;
 
@@ -333,6 +335,8 @@ sub vcl_error {
     synthetic {""};
     return (deliver);
   }
+
+  ${indent(2, file("${module_path}/../shared/_security_txt_response.vcl"))}
 
   # Serve stale from error subroutine as recommended in:
   # https://docs.fastly.com/guides/performance-tuning/serving-stale-content

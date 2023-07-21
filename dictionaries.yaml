@@ -3,7 +3,6 @@ active_ab_tests:
   BankHolidaysTest: true
 ab_test_expiries:
   Example: 86400
-  UxmPracticeTest: 86400
   BankHolidaysTest: 86400
 # AB test percentages
 example_percentages:

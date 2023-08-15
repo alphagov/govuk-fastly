@@ -1,11 +1,9 @@
 active_ab_tests:
   Example: true
   BankHolidaysTest: true
-  EsSixPointSeven: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  EsSixPointSeven: 604800
 # AB test percentages
 example_percentages:
   A: 50
@@ -13,6 +11,3 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
-essixpointseven_percentages:
-  A: 50
-  B: 50

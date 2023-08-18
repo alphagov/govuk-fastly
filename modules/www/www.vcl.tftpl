@@ -140,7 +140,7 @@ backend F_mirrorGCS {
 %{ if environment != "production" ~}
 acl allowed_ip_addresses {
   %{ for ip in formatted_allowed_ip_addresses ~}
-  ${ip}
+  ${ip};
   %{ endfor ~}
 }
 %{ endif ~}

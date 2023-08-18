@@ -1,0 +1,29 @@
+name: Build and push diff generator image
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+    paths:
+      - "diff-generator/*"
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_GOVUK_ECR_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_GOVUK_ECR_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      - uses: aws-actions/amazon-ecr-login@v1
+        id: ecr
+      - name: Build and push image
+        env:
+          DOCKER_BUILDKIT: "1"
+          ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          IMAGE_URI="${ECR_REGISTRY}/govuk-fastly-diff-generator:latest"
+          cd diff-generator
+          docker build . -t "${IMAGE_URI}"
+          docker push "${IMAGE_URI}"

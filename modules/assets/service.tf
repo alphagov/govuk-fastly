@@ -43,7 +43,7 @@ resource "fastly_service_vcl" "service" {
   vcl {
     main = true
     name = "main"
-    content = templatefile("${path.module}/assets.vcl.tftpl", local.template_values)
+    content = templatefile("${path.module}/${var.vcl_template_file}", local.template_values)
   }
 
   dynamic "condition" {

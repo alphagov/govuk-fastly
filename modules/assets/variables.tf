@@ -9,3 +9,7 @@ variable "configuration" {
 variable "dictionaries" {
   default = {}
 }
+
+variable "vcl_template_file" {
+  default = "assets.vcl.tftpl"
+}

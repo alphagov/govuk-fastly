@@ -8,7 +8,7 @@ backend F_origin {
     .between_bytes_timeout = 10s;
 
     .ssl = true;
-    .ssl_check_cert = true;
+    .ssl_check_cert = always;
     .min_tls_version = "${minimum_tls_version}";
     .ssl_ciphers = "${ssl_ciphers}";
     .ssl_cert_hostname = "${origin_hostname}";
@@ -48,7 +48,7 @@ backend F_mirrorS3 {
     .between_bytes_timeout = 10s;
 
     .ssl = true;
-    .ssl_check_cert = true;
+    .ssl_check_cert = always;
     .min_tls_version = "${minimum_tls_version}";
     .ssl_ciphers = "${ssl_ciphers}";
     .ssl_cert_hostname = "${s3_mirror_hostname}";
@@ -81,7 +81,7 @@ backend F_mirrorS3Replica {
     .between_bytes_timeout = 10s;
 
     .ssl = true;
-    .ssl_check_cert = true;
+    .ssl_check_cert = always;
     .min_tls_version = "${minimum_tls_version}";
     .ssl_ciphers = "${ssl_ciphers}";
     .ssl_cert_hostname = "${s3_mirror_replica_hostname}";
@@ -114,7 +114,7 @@ backend F_mirrorGCS {
     .between_bytes_timeout = 10s;
 
     .ssl = true;
-    .ssl_check_cert = true;
+    .ssl_check_cert = always;
     .min_tls_version = "${minimum_tls_version}";
     .ssl_ciphers = "${ssl_ciphers}";
     .ssl_cert_hostname = "${gcs_mirror_hostname}";

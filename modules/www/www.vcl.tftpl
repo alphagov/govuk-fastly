@@ -146,6 +146,8 @@ acl allowed_ip_addresses {
 %{ endif ~}
 
 sub vcl_recv {
+  declare local var.backend_override STRING;
+
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
   # Require authentication for PURGE requests
@@ -245,7 +247,7 @@ ${private_extra_vcl_recv}
   }
 
   # Common config when failover to mirror buckets
-  if (req.restarts > 0) {
+  if (req.restarts > 0 || std.prefixof(var.backend_override, "mirror")) {
     set req.url = req.http.original-url;
 
     # Don't serve from stale for mirrors
@@ -267,7 +269,7 @@ ${private_extra_vcl_recv}
   }
 
   # Failover to primary s3 mirror.
-  if (req.restarts == 1) {
+  if (req.restarts == 1 || var.backend_override == "mirrorS3") {
       set req.backend = F_mirrorS3;
       set req.http.host = "${s3_mirror_hostname}";
       set req.http.Fastly-Backend-Name = "mirrorS3";
@@ -277,7 +279,7 @@ ${private_extra_vcl_recv}
   }
 
   # Failover to replica s3 mirror.
-  if (req.restarts == 2) {
+  if (req.restarts == 2 || var.backend_override == "mirrorS3Replica") {
     set req.backend = F_mirrorS3Replica;
     set req.http.host = "${s3_mirror_replica_hostname}";
     set req.http.Fastly-Backend-Name = "mirrorS3Replica";
@@ -287,7 +289,7 @@ ${private_extra_vcl_recv}
   }
 
   # Failover to GCS mirror.
-  if (req.restarts > 2) {
+  if (req.restarts > 2 || var.backend_override == "mirrorGCS") {
     set req.backend = F_mirrorGCS;
     set req.http.host = "${gcs_mirror_hostname}";
     set req.http.Fastly-Backend-Name = "mirrorGCS";

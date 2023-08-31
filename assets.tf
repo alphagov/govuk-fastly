@@ -7,7 +7,7 @@ module "assets-integration" {
 
   configuration = {
     environment = "integration"
-    run_id = var.TFC_RUN_ID
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
     probe = "/"
   }
 
@@ -25,7 +25,7 @@ module "assets-staging" {
 
   configuration = {
     environment = "staging"
-    run_id = var.TFC_RUN_ID
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
     probe = "/"
   }
 
@@ -43,7 +43,7 @@ module "assets-production" {
 
   configuration = {
     environment = "production"
-    run_id = var.TFC_RUN_ID
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
     probe = "/"
   }
 

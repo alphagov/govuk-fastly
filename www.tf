@@ -11,7 +11,7 @@ module "www-integration" {
 
   configuration = {
     environment = "integration"
-    run_id = var.TFC_RUN_ID
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
     probe = "/"
     ab_tests = local.ab_tests
   }
@@ -30,7 +30,7 @@ module "www-staging" {
 
   configuration = {
     environment = "staging"
-    run_id = var.TFC_RUN_ID
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
     probe = "/"
     ab_tests = local.ab_tests
   }
@@ -49,7 +49,7 @@ module "www-production" {
 
   configuration = {
     environment = "production"
-    run_id = var.TFC_RUN_ID
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
     probe = "/"
     ab_tests = local.ab_tests
   }

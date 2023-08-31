@@ -15,10 +15,10 @@ terraform {
 
 provider "fastly" {}
 
-variable "TFC_RUN_ID" {
+variable "TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA" {
   type = string
   default = "unknown"
-  description = "Terraform Cloud run ID (automatically populated)"
+  description = "Git commit hash (automatically populated)"
 }
 
 variable "dictionaries" {

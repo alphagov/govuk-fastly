@@ -19,7 +19,7 @@ backend F_awsorigin {
         .request =
             "HEAD /__canary__ HTTP/1.1"
             "Host: ${aws_origin_hostname}"
-            "User-Agent: Fastly healthcheck (TFC run ID: ${run_id})"
+            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
 %{ if rate_limit_token != null }
             "Rate-Limit-Token: ${rate_limit_token}"
 %{ endif }
@@ -56,7 +56,7 @@ backend F_mirrorS3 {
         .request =
             "HEAD ${s3_mirror_probe} HTTP/1.1"
             "Host: ${s3_mirror_hostname}"
-            "User-Agent: Fastly healthcheck (TFC run ID: ${run_id})"
+            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
             "Connection: close";
         .threshold = 1;
         .window = 2;
@@ -89,7 +89,7 @@ backend F_mirrorS3Replica {
         .request =
             "HEAD ${s3_mirror_replica_probe} HTTP/1.1"
             "Host: ${s3_mirror_replica_hostname}"
-            "User-Agent: Fastly healthcheck (TFC run ID: ${run_id})"
+            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
             "Connection: close";
         .threshold = 1;
         .window = 2;
@@ -122,7 +122,7 @@ backend F_mirrorGCS {
         .request =
             "HEAD ${gcs_mirror_probe} HTTP/1.1"
             "Host: ${gcs_mirror_hostname}"
-            "User-Agent: Fastly healthcheck (TFC run ID: ${run_id})"
+            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
             "Connection: close";
         .threshold = 1;
         .window = 2;

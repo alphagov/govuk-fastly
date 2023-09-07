@@ -14,5 +14,6 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 essixpointseven_percentages:
-  A: 50
-  B: 50
+  A: 0.5
+  B: 0.5
+  C: 99

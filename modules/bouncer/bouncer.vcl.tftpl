@@ -50,11 +50,6 @@ sub vcl_recv {
     set req.http.Fastly-Purge-Requires-Auth = "1";
   }
 
-  # Serve a 404 Not Found response if request URL matches "/autodiscover/autodiscover.xml"
-  if (req.url.path ~ "(?i)/autodiscover/autodiscover.xml$") {
-    error 804 "Not Found";
-  }
-
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
   # Serve from stale for 24 hours if origin is sick

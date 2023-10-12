@@ -163,7 +163,7 @@ sub vcl_recv {
   }
   %{ if environment == "staging" }
   # Only allow connections from allowed IP addresses in staging
-  if (! (client.ip ~ allowed_ip_addresses)) {
+  if (! (req.http.True-Client-IP ~ allowed_ip_addresses)) {
     error 403 "Forbidden";
   }
   %{ endif ~}

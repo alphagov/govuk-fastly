@@ -2,10 +2,12 @@ active_ab_tests:
   Example: true
   BankHolidaysTest: true
   EsSixPointSeven: true
+  FindUtrNumberVideoLinks: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
   EsSixPointSeven: 86400
+  FindUtrNumberVideoLinks: 7776000 # 90 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -16,3 +18,7 @@ bankholidaystest_percentages:
 essixpointseven_percentages:
   A: 50
   B: 50
+findutrnumbervideolinks_percentages:
+  A: 50
+  B: 50
+  Z: 0

@@ -229,7 +229,7 @@ sub vcl_recv {
     set req.http.original-url = req.url;
   }
 
-  %{ if environment == "staging" }
+  %{ if contains(["staging", "production"], environment) }
   set var.backend_override = req.http.Backend-Override;
   %{ endif ~}
 

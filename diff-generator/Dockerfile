@@ -3,7 +3,7 @@ FROM public.ecr.aws/lts/ubuntu:22.04_stable
 RUN apt update && \
   apt install -y --no-install-recommends python3 python3-pip npm && \
   rm -r /var/lib/apt/lists /var/cache/apt/archives && \
-  npm install -g diff2html-cli@5.2.9
+  npm install -g diff2html-cli@5
 
 WORKDIR /function
 

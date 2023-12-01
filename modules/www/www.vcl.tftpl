@@ -387,7 +387,6 @@ sub vcl_fetch {
   }
 
   if (beresp.status >= 500 && beresp.status <= 599) {
-    set req.http.Fastly-Cachetype = "ERROR";
     set beresp.ttl = 1s;
     set beresp.grace = 5s;
     if (beresp.http.Fastly-Backend-Name ~ "^mirror") {
@@ -397,7 +396,6 @@ sub vcl_fetch {
   }
 
   if (beresp.http.Cache-Control ~ "private") {
-    set req.http.Fastly-Cachetype = "PRIVATE";
     return (pass);
   }
 

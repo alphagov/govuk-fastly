@@ -7,10 +7,11 @@
 - BankHolidaysTest:
   - A
   - B
-- EsSixPointSeven:
-  - A
-  - B
 - FindUtrNumberVideoLinks:
   - A
   - B
   - Z
+- VertexSearch:
+  - A
+  - B
+  - Z  

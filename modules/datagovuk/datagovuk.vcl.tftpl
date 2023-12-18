@@ -152,6 +152,10 @@ sub vcl_recv {
 
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
+  # Default backend.
+  set req.backend = F_origin;
+  set req.http.Fastly-Backend-Name = "origin";
+
   %{ if contains(["staging", "production"], environment) ~}
 
   # Save original request url because req.url changes after restarts.

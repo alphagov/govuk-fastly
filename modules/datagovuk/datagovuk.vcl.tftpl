@@ -140,6 +140,11 @@ backend F_mirrorGCS {
 sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
+  # Check whether the remote IP address is in the list of blocked IPs
+  if (table.lookup(ip_address_denylist, client.ip)) {
+    error 403 "Forbidden";
+  }
+
   # Force SSL.
   if (!req.http.Fastly-SSL) {
      error 801 "Force SSL";

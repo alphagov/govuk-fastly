@@ -105,34 +105,6 @@ resource "fastly_service_vcl" "service" {
     request_condition = "education_standards"
   }
 
-  dynamic "logging_splunk" {
-    for_each = {
-      for splunk in lookup(var.secrets, "splunk", []) : splunk.name => splunk
-    }
-    iterator = each
-    content {
-      name           = "Splunk"
-      format_version = 2
-      format = lookup(each.value, "format", chomp(
-        <<-EOT
-        {
-          "time": %%{time.start.sec}V,
-          "host": "Fastly",
-          "index": "${each.value.index}",
-          "source": "%%{server.region}V:%%{server.datacenter}V:%%{server.hostname}V",
-          "sourcetype": "csv:govukcdn_extended",
-          "event": "%h %t \\"%r\\" %>s %b \\"%%{Content-Type}o\\" \\"%%{User-Agent}i\\" \\"%%{Referer}i\\" \\"%%{X-Forwarded-For}i\\" \\"%%{Accept}i\\" %%{fastly_info.state}V"
-        }
-        EOT
-      ))
-      tls_hostname = each.value.hostname
-      token        = each.value.token
-      url          = each.value.url
-      use_tls      = true
-      response_condition = lookup(each.value, "response_condition", null)
-    }
-  }
-
   dynamic "logging_s3" {
     for_each = {
       for s3 in lookup(var.secrets, "s3", []) : s3.name => s3

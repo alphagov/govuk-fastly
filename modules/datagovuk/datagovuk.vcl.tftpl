@@ -136,7 +136,6 @@ backend F_mirrorGCS {
     }
 }
 %{ endif }
-
 acl purge_ip_allowlist {
 %{ if environment == "integration" ~}
   "34.248.229.46";  # AWS Integration NAT gateways
@@ -181,6 +180,26 @@ sub vcl_recv {
   unset req.http.Client-IP;
   set req.http.X-Forwarded-For = req.http.Fastly-Client-IP;
   set req.http.X-Forwarded-Host = req.http.host;
+
+  # Enable real time logging of JA3 signatures for future analysis
+  if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
+    set req.http.Client-JA3 = tls.client.ja3_md5;
+  }
+
+  # Require authentication for FASTLYPURGE requests unless from IP in ACL
+  if (req.request == "FASTLYPURGE" && client.ip !~ purge_ip_allowlist) {
+    set req.http.Fastly-Purge-Requires-Auth = "1";
+  }
+
+  # Reset proxy headers at the boundary to our network.
+  unset req.http.Client-IP;
+  set req.http.X-Forwarded-For = req.http.Fastly-Client-IP;
+  set req.http.X-Forwarded-Host = req.http.host;
+
+  # Require authentication for FASTLYPURGE requests unless from IP in ACL
+  if (req.request == "FASTLYPURGE" && client.ip !~ purge_ip_allowlist) {
+    set req.http.Fastly-Purge-Requires-Auth = "1";
+  }
 
   # Check whether the remote IP address is in the list of blocked IPs
   if (table.lookup(ip_address_denylist, client.ip)) {

@@ -176,6 +176,12 @@ sub vcl_recv {
   if (req.request == "FASTLYPURGE" && client.ip !~ purge_ip_allowlist) {
     set req.http.Fastly-Purge-Requires-Auth = "1";
   }
+
+  # Reset proxy headers at the boundary to our network.
+  unset req.http.Client-IP;
+  set req.http.X-Forwarded-For = req.http.Fastly-Client-IP;
+  set req.http.X-Forwarded-Host = req.http.host;
+
   # Check whether the remote IP address is in the list of blocked IPs
   if (table.lookup(ip_address_denylist, client.ip)) {
     error 403 "Forbidden";

@@ -216,8 +216,16 @@ sub vcl_recv {
 
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
+  # Remove any Google Analytics campaign params
+  set req.url = querystring.globfilter(req.url, "utm_*");
+
   # Sort query params (improve cache hit rate)
   set req.url = querystring.sort(req.url);
+
+  # Remove all query parameters from homepage
+  if (req.url.path == "/") {
+    set req.url = querystring.remove(req.url);
+  }
 
   # Serve from stale for 24 hours if origin is sick
   set req.grace = 24h;

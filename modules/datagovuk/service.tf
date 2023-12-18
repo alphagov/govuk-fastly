@@ -87,6 +87,24 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
+  header {
+    name              = "education_standards_url"
+    action            = "set"
+    type              = "request"
+    destination       = "url"
+    source            = "regsub(req.url, \"^/education-standards\", \"\")"
+    request_condition = "education_standards"
+  }
+
+  header {
+    name              = "education_standards_host"
+    action            = "set"
+    type              = "request"
+    destination       = "http.host"
+    source            = "\"dfe-app1.codeenigma.net\""
+    request_condition = "education_standards"
+  }
+
   dynamic "logging_s3" {
     for_each = {
       for s3 in lookup(var.secrets, "s3", []) : s3.name => s3

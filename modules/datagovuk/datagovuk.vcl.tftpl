@@ -187,6 +187,9 @@ sub vcl_recv {
 
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
+  # Sort query params (improve cache hit rate)
+  set req.url = querystring.sort(req.url);
+
   # Serve from stale for 24 hours if origin is sick
   set req.grace = 24h;
 

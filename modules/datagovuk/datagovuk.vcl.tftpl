@@ -36,107 +36,6 @@ backend F_origin {
 %{ endif ~}
 }
 
-%{ if contains(["staging", "production"], environment) }
-# Mirror backend for S3
-backend F_mirrorS3 {
-    .connect_timeout = 1s;
-    .dynamic = true;
-    .port = "${s3_mirror_port}";
-    .host = "${s3_mirror_hostname}";
-    .first_byte_timeout = 15s;
-    .max_connections = 200;
-    .between_bytes_timeout = 10s;
-
-    .ssl = true;
-    .ssl_check_cert = always;
-    .min_tls_version = "${minimum_tls_version}";
-    .ssl_ciphers = "${ssl_ciphers}";
-    .ssl_cert_hostname = "${s3_mirror_hostname}";
-    .ssl_sni_hostname = "${s3_mirror_hostname}";
-
-    .probe = {
-        .dummy = ${probe_dns_only};
-        .request =
-            "HEAD ${s3_mirror_probe} HTTP/1.1"
-            "Host: ${s3_mirror_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
-            "Connection: close";
-        .threshold = 1;
-        .window = 2;
-        .timeout = 5s;
-        .initial = 1;
-        .expected_response = 200;
-        .interval = ${probe_interval};
-    }
-}
-
-# Mirror backend for S3 replica
-backend F_mirrorS3Replica {
-    .connect_timeout = 1s;
-    .dynamic = true;
-    .port = "${s3_mirror_replica_port}";
-    .host = "${s3_mirror_replica_hostname}";
-    .first_byte_timeout = 15s;
-    .max_connections = 200;
-    .between_bytes_timeout = 10s;
-
-    .ssl = true;
-    .ssl_check_cert = always;
-    .min_tls_version = "${minimum_tls_version}";
-    .ssl_ciphers = "${ssl_ciphers}";
-    .ssl_cert_hostname = "${s3_mirror_replica_hostname}";
-    .ssl_sni_hostname = "${s3_mirror_replica_hostname}";
-
-    .probe = {
-        .dummy = ${probe_dns_only};
-        .request =
-            "HEAD ${s3_mirror_replica_probe} HTTP/1.1"
-            "Host: ${s3_mirror_replica_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
-            "Connection: close";
-        .threshold = 1;
-        .window = 2;
-        .timeout = 5s;
-        .initial = 1;
-        .expected_response = 200;
-        .interval = ${probe_interval};
-    }
-}
-
-# Mirror backend for GCS
-backend F_mirrorGCS {
-    .connect_timeout = 1s;
-    .dynamic = true;
-    .port = "${gcs_mirror_port}";
-    .host = "${gcs_mirror_hostname}";
-    .first_byte_timeout = 15s;
-    .max_connections = 200;
-    .between_bytes_timeout = 10s;
-
-    .ssl = true;
-    .ssl_check_cert = always;
-    .min_tls_version = "${minimum_tls_version}";
-    .ssl_ciphers = "${ssl_ciphers}";
-    .ssl_cert_hostname = "${gcs_mirror_hostname}";
-    .ssl_sni_hostname = "${gcs_mirror_hostname}";
-
-    .probe = {
-        .dummy = ${probe_dns_only};
-        .request =
-            "HEAD ${gcs_mirror_probe} HTTP/1.1"
-            "Host: ${gcs_mirror_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
-            "Connection: close";
-        .threshold = 1;
-        .window = 2;
-        .timeout = 5s;
-        .initial = 1;
-        .expected_response = 403;
-        .interval = ${probe_interval};
-    }
-}
-%{ endif }
-
 sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
@@ -211,51 +110,6 @@ sub vcl_recv {
   if (req.restarts < 1) {
     set req.http.original-url = req.url;
   }
-
-  # Common config when failover to mirror buckets
-  if (req.restarts > 0) {
-    set req.url = req.http.original-url;
-
-    # Don't serve from stale for mirrors
-    set req.grace = 0s;
-    set req.http.Fastly-Failover = "1";
-
-    # Replace multiple /
-    set req.url = regsuball(req.url, "([^:])//+", "\1/");
-  }
-
-  # Failover to primary s3 mirror.
-  if (req.restarts == 1) {
-      set req.backend = F_mirrorS3;
-      set req.http.host = "${s3_mirror_hostname}";
-      set req.http.Fastly-Backend-Name = "mirrorS3";
-
-      # Add bucket directory prefix to all the requests
-      set req.url = "/${s3_mirror_prefix}" req.url;
-  }
-
-  # Failover to replica s3 mirror.
-  if (req.restarts == 2) {
-    set req.backend = F_mirrorS3Replica;
-    set req.http.host = "${s3_mirror_replica_hostname}";
-    set req.http.Fastly-Backend-Name = "mirrorS3Replica";
-
-    # Add bucket directory prefix to all the requests
-    set req.url = "/${s3_mirror_replica_prefix}" req.url;
-  }
-
-  # Failover to GCS mirror.
-  if (req.restarts > 2) {
-    set req.backend = F_mirrorGCS;
-    set req.http.host = "${gcs_mirror_hostname}";
-    set req.http.Fastly-Backend-Name = "mirrorGCS";
-
-    # Add bucket directory prefix to all the requests
-    set req.url = "/${gcs_mirror_prefix}" req.url;
-
-    set req.http.Date = now;
-    set req.http.Authorization = "AWS ${gcs_mirror_access_id}:" digest.hmac_sha1_base64("${gcs_mirror_secret_key}", "GET" LF LF LF now LF "/${gcs_mirror_bucket_name}" req.url.path);
-  }
   %{ endif ~}
 
 #FASTLY recv
@@ -298,12 +152,9 @@ sub vcl_fetch {
     return (pass);
   }
 
-  if (beresp.status >= 500 && beresp.status <= 599) {
+  if (beresp.status == 500 || beresp.status == 503) {
     set beresp.ttl = 1s;
     set beresp.grace = 5s;
-    if (beresp.http.Fastly-Backend-Name ~ "mirrorS3") {
-      error 503 "Error page";
-    }
     return (deliver);
   }
 
@@ -312,16 +163,6 @@ sub vcl_fetch {
   } else {
     # apply the default ttl
     set beresp.ttl = ${default_ttl}s;
-    # S3 does not set cache headers by default. Override TTL and add cache-control with 15 minutes
-    if (beresp.http.Fastly-Backend-Name ~ "mirrorS3") {
-      set beresp.ttl = 900s;
-      set beresp.http.Cache-Control = "max-age=900";
-    }
-  }
-
-  # Override default.vcl behaviour of return(pass).
-  if (beresp.http.Set-Cookie) {
-    return (deliver);
   }
 }
 
@@ -360,9 +201,7 @@ sub vcl_error {
   }
 
   # Assume we've hit vcl_error() because the backend is unavailable
-  # for the first two retries. By restarting, vcl_recv() will try
-  # serving from stale before failing over to the mirrors.
-  if (req.restarts < 3) {
+  if (req.restarts < 2) {
     return (restart);
   }
 

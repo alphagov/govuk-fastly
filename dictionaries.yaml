@@ -4,12 +4,14 @@ active_ab_tests:
   FindUtrNumberVideoLinks: true
   VertexSearch: true
   HomepagePopularLinksTest: true
+  SAVideoPayBill: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
   FindUtrNumberVideoLinks: 7776000 # 90 days
   VertexSearch: 86400
   HomepagePopularLinksTest: 172800 # 2 days
+  SAVideoPayBill: 7776000 # 90 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -31,3 +33,7 @@ homepagepopularlinkstest_percentages:
   C: 0
   D: 0
   Z: 100
+savideopaybill_percentages:
+  A: 50
+  B: 50
+  Z: 0

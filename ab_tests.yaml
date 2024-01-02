@@ -21,3 +21,19 @@
   - C
   - D
   - Z
+- SAVideoStopSelfEmployed:
+  - A
+  - B
+  - Z
+- SAVideoReturn1:
+  - A
+  - B
+  - z
+- SAVideoPayBill:
+  - A
+  - B
+  - Z
+- ReadyReckonerVideoTest:
+  - A
+  - B
+  - Z

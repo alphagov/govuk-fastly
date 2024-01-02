@@ -4,12 +4,20 @@ active_ab_tests:
   FindUtrNumberVideoLinks: true
   VertexSearch: true
   HomepagePopularLinksTest: true
+  SAVideoStopSelfEmployed: true
+  SAVideoReturn1: true
+  SAVideoPayBill: true
+  ReadyReckonerVideoTest: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
   FindUtrNumberVideoLinks: 7776000 # 90 days
   VertexSearch: 86400
   HomepagePopularLinksTest: 172800 # 2 days
+  SAVideoStopSelfEmployed: 86400 # 1 day
+  SAVideoReturn1: 86400 # 1 day
+  SAVideoPayBill: 86400 # 1 day
+  ReadyReckonerVideoTest: 86400 # 1 day
 # AB test percentages
 example_percentages:
   A: 50
@@ -30,4 +38,20 @@ homepagepopularlinkstest_percentages:
   B: 0
   C: 0
   D: 0
+  Z: 100
+savideostopselfemployed_percentages:
+  A: 0
+  B: 0
+  Z: 100
+savideoreturn1_percentages:
+  A: 0
+  B: 0
+  Z: 100
+savideopaybill_percentages:
+  A: 0
+  B: 0
+  Z: 100
+readyreckonervideotest_percentages:
+  A: 0
+  B: 0
   Z: 100

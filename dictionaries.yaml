@@ -14,10 +14,10 @@ ab_test_expiries:
   FindUtrNumberVideoLinks: 7776000 # 90 days
   VertexSearch: 86400
   HomepagePopularLinksTest: 172800 # 2 days
-  SAVideoStopSelfEmployed: 86400 # 1 day
-  SAVideoReturn1: 86400 # 1 day
-  SAVideoPayBill: 86400 # 1 day
-  ReadyReckonerVideoTest: 86400 # 1 day
+  SAVideoStopSelfEmployed: 7776000 # 90 days
+  SAVideoReturn1: 7776000 # 90 days
+  SAVideoPayBill: 7776000 # 90 days
+  ReadyReckonerVideoTest: 7776000 # 90 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -40,18 +40,18 @@ homepagepopularlinkstest_percentages:
   D: 0
   Z: 100
 savideostopselfemployed_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 50
+  B: 50
+  Z: 0
 savideoreturn1_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 50
+  B: 50
+  Z: 0
 savideopaybill_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 50
+  B: 50
+  Z: 0
 readyreckonervideotest_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 50
+  B: 50
+  Z: 0

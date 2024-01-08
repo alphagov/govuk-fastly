@@ -34,11 +34,11 @@ vertexsearch_percentages:
   B: 0
   Z: 100
 homepagepopularlinkstest_percentages:
-  A: 0
-  B: 0
-  C: 0
-  D: 0
-  Z: 100
+  A: 5
+  B: 5
+  C: 5
+  D: 5
+  Z: 80
 savideostopselfemployed_percentages:
   A: 50
   B: 50

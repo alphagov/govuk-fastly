@@ -43,6 +43,8 @@ resource "fastly_service_vcl" "service" {
   name    = "${title(local.template_values["environment"])} GOV.UK"
   comment = ""
 
+  http3 = var.configuration.environment == "staging"
+
   domain {
     name = local.template_values["hostname"]
   }

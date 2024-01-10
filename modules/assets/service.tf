@@ -143,7 +143,27 @@ resource "fastly_service_vcl" "service" {
 
       format = lookup(each.value, "format", chomp(
         <<-EOT
-        { "client_ip":"%%{json.escape(client.ip)}V", "request_received":"%%{begin:%Y-%m-%d %H:%M:%S.}t%%{time.start.msec_frac}V", "request_received_offset":"%%{begin:%z}t", "method":"%%{json.escape(req.method)}V", "url":"%%{json.escape(req.url)}V", "status":%>s, "request_time":%%{time.elapsed.sec}V.%%{time.elapsed.msec_frac}V, "time_to_generate_response":%%{time.to_first_byte}V, "bytes":%B, "content_type":"%%{json.escape(resp.http.Content-Type)}V", "user_agent":"%%{json.escape(req.http.User-Agent)}V", "fastly_backend":"%%{json.escape(resp.http.Fastly-Backend-Name)}V", "data_centre":"%%{json.escape(server.datacenter)}V", "cache_hit":%%{if(fastly_info.state ~"^(HIT|MISS)(?:-|$)", "true", "false")}V, "cache_response":"%%{regsub(fastly_info.state, "^(HIT-(SYNTH)|(HITPASS|HIT|MISS|PASS|ERROR|PIPE)).*", "\\2\\3") }V", "tls_client_protocol":"%%{json.escape(tls.client.protocol)}V", "tls_client_cipher":"%%{json.escape(tls.client.cipher)}V", "client_ja3":"%%{json.escape(req.http.Client-JA3)}V" }
+        {
+          "client_ip":"%%{json.escape(client.ip)}V",
+          "request_received":"%%{begin:%Y-%m-%d %H:%M:%S.}t%%{time.start.msec_frac}V",
+          "request_received_offset":"%%{begin:%z}t",
+          "method":"%%{json.escape(req.method)}V",
+          "url":"%%{json.escape(req.url)}V",
+          "status":%>s,
+          "protocol":"%%{json.escape(req.proto)}",
+          "request_time":%%{time.elapsed.sec}V.%%{time.elapsed.msec_frac}V,
+          "time_to_generate_response":%%{time.to_first_byte}V,
+          "bytes":%B,
+          "content_type":"%%{json.escape(resp.http.Content-Type)}V",
+          "user_agent":"%%{json.escape(req.http.User-Agent)}V",
+          "fastly_backend":"%%{json.escape(resp.http.Fastly-Backend-Name)}V",
+          "data_centre":"%%{json.escape(server.datacenter)}V",
+          "cache_hit":%%{if(fastly_info.state ~"^(HIT|MISS)(?:-|$)", "true", "false")}V,
+          "cache_response":"%%{regsub(fastly_info.state, "^(HIT-(SYNTH)|(HITPASS|HIT|MISS|PASS|ERROR|PIPE)).*", "\\2\\3") }V",
+          "tls_client_protocol":"%%{json.escape(tls.client.protocol)}V",
+          "tls_client_cipher":"%%{json.escape(tls.client.cipher)}V",
+          "client_ja3":"%%{json.escape(req.http.Client-JA3)}V"
+        }
         EOT
       ))
     }

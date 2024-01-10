@@ -36,6 +36,8 @@ resource "fastly_service_vcl" "service" {
   name    = "${title(local.template_values["environment"])} Assets"
   comment = ""
 
+  http3 = true
+
   domain {
     name = local.template_values["hostname"]
   }

@@ -166,6 +166,7 @@ resource "fastly_service_vcl" "service" {
           "method":"%%{json.escape(req.method)}V",
           "url":"%%{json.escape(req.url)}V",
           "status":%>s,
+          "protocol":"%%{json.escape(req.proto)}V",
           "request_time":%%{time.elapsed.sec}V.%%{time.elapsed.msec_frac}V,
           "time_to_generate_response":%%{time.to_first_byte}V,
           "bytes":%B,

@@ -13,7 +13,7 @@ ab_test_expiries:
   BankHolidaysTest: 86400
   FindUtrNumberVideoLinks: 7776000 # 90 days
   VertexSearch: 86400
-  HomepagePopularLinksTest: 172800 # 2 days
+  HomepagePopularLinksTest: 604800 # 7 days
   SAVideoStopSelfEmployed: 7776000 # 90 days
   SAVideoReturn1: 7776000 # 90 days
   SAVideoPayBill: 7776000 # 90 days

@@ -1,5 +1,11 @@
 locals {
-  formatted_allowed_ips = [for ip in try(var.secrets["allowed_ip_addresses"], []) : "\"${split("/", ip)[0]}\"/${split("/", ip)[1]}"]
+  ip_allowlist = try(var.secrets["allowed_ip_addresses"], [])
+  allowed_cidrs = [
+    for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"
+  ]
+  formatted_allowed_ips = [
+    for v in local.allowed_cidrs : format("\"%s\"/%s", split("/", v)[0], split("/", v)[1])
+  ]
   template_values = merge(
     { # some defaults
       origin_port = 443

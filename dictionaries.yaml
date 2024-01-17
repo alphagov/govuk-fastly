@@ -3,7 +3,6 @@ active_ab_tests:
   BankHolidaysTest: true
   FindUtrNumberVideoLinks: true
   VertexSearch: true
-  HomepagePopularLinksTest: true
   SAVideoStopSelfEmployed: true
   SAVideoReturn1: true
   SAVideoPayBill: true
@@ -13,7 +12,6 @@ ab_test_expiries:
   BankHolidaysTest: 86400
   FindUtrNumberVideoLinks: 7776000 # 90 days
   VertexSearch: 86400
-  HomepagePopularLinksTest: 604800 # 7 days
   SAVideoStopSelfEmployed: 7776000 # 90 days
   SAVideoReturn1: 7776000 # 90 days
   SAVideoPayBill: 7776000 # 90 days
@@ -33,12 +31,6 @@ vertexsearch_percentages:
   A: 0
   B: 0
   Z: 100
-homepagepopularlinkstest_percentages:
-  A: 25
-  B: 25
-  C: 25
-  D: 25
-  Z: 0
 savideostopselfemployed_percentages:
   A: 50
   B: 50

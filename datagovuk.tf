@@ -13,35 +13,3 @@ module "datagovuk-integration" {
 
   secrets = yamldecode(var.datagovuk_integration)
 }
-
-variable "datagovuk_staging" {
-  type = string
-}
-
-module "datagovuk-staging" {
-  source = "./modules/datagovuk"
-
-  configuration = {
-    environment = "staging"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
-  }
-
-  secrets = yamldecode(var.datagovuk_staging)
-}
-
-variable "datagovuk_production" {
-  type = string
-}
-
-module "datagovuk-production" {
-  source = "./modules/datagovuk"
-
-  configuration = {
-    environment = "production"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
-  }
-
-  secrets = yamldecode(var.datagovuk_production)
-}

@@ -44,8 +44,12 @@ resource "fastly_service_vcl" "service" {
   name    = "${title(local.template_values["environment"])} data.gov.uk"
   comment = ""
 
-  domain {
-    name = local.template_values["hostname"]
+  dynamic "domain" {
+    for_each = lookup(local.template_values, "hostnames", [])
+    iterator = each
+    content {
+      name = each.value
+    }
   }
 
   vcl {

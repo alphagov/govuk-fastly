@@ -15,19 +15,15 @@
   - A
   - B
   - Z
-- SAVideoStopSelfEmployed:
+- SAVideoStopSelfEmployed2:
   - A
   - B
   - Z
-- SAVideoReturn1:
+- SAVideoReturn2:
   - A
   - B
   - Z
-- SAVideoPayBill:
-  - A
-  - B
-  - Z
-- ReadyReckonerVideoTest:
+- ReadyReckonerVideoTest2:
   - A
   - B
   - Z

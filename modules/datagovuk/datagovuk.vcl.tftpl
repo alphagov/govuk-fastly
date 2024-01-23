@@ -1,0 +1,237 @@
+backend F_origin {
+    .connect_timeout = 5s;
+    .dynamic = true;
+    .port = "${origin_port}";
+    .host = "${origin_hostname}";
+    .first_byte_timeout = 15s;
+    .max_connections = 200;
+    .between_bytes_timeout = 10s;
+
+    .ssl = true;
+    .ssl_check_cert = always;
+    .min_tls_version = "${minimum_tls_version}";
+    .ssl_ciphers = "${ssl_ciphers}";
+    .ssl_cert_hostname = "${origin_hostname}";
+    .ssl_sni_hostname = "${origin_hostname}";
+
+%{ if probe != null ~}
+    .probe = {
+        .dummy = ${probe_dns_only};
+        .request =
+            "HEAD ${probe} HTTP/1.1"
+            "Host: ${origin_hostname}"
+            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
+            "Rate-Limit-Token: ${rate_limit_token}"
+%{ if basic_authentication != null ~}
+            "Authorization: Basic ${basic_authentication}"
+%{ endif ~}
+            "Connection: close";
+        .threshold = 1;
+        .window = 2;
+        .timeout = 5s;
+        .initial = 1;
+        .expected_response = 200;
+        .interval = ${probe_interval};
+    }
+%{ endif ~}
+}
+
+sub vcl_recv {
+  ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
+
+  # Require authentication for PURGE requests
+  set req.http.Fastly-Purge-Requires-Auth = "1";
+
+  # Reset proxy headers at the boundary to our network.
+  unset req.http.Client-IP;
+  set req.http.X-Forwarded-For = req.http.Fastly-Client-IP;
+  set req.http.X-Forwarded-Host = req.http.host;
+
+  # Enable real time logging of JA3 signatures for future analysis
+  if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
+    set req.http.Client-JA3 = tls.client.ja3_md5;
+  }
+
+  # Check whether the remote IP address is in the list of blocked IPs
+  if (table.lookup(ip_address_denylist, client.ip)) {
+    error 403 "Forbidden";
+  }
+
+  # Block requests that match a known bad signature
+  if (req.restarts == 0 && fastly.ff.visits_this_service == 0) {
+    if (table.lookup(ja3_signature_denylist, req.http.Client-JA3, "false") == "true") {
+      error 403 "Forbidden";
+    }
+  }
+  %{ if basic_authentication != null }
+  if (! (client.ip ~ allowed_ip_addresses)) {
+    # Check whether the basic auth credentials are correct in integration
+    if (req.http.Authorization != "Basic ${basic_authentication}") {
+      error 401 "Unauthorized";
+    }
+  }
+  %{ endif ~}
+
+  # Strip Accept-Encoding header if the content is already compressed
+  if (req.http.Accept-Encoding) {
+    if (req.url ~ "\.(jpeg|jpg|png|gif|gz|tgz|bz2|tbz|zip|flv|pdf|mp3|ogg)$") {
+      remove req.http.Accept-Encoding;
+    }
+  }
+
+  # Force SSL.
+  if (!req.http.Fastly-SSL) {
+     error 801 "Force SSL";
+  }
+
+  ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
+
+  # Remove any Google Analytics campaign params
+  set req.url = querystring.globfilter(req.url, "utm_*");
+
+  # Sort query params (improve cache hit rate)
+  set req.url = querystring.sort(req.url);
+
+  # Remove all query parameters from homepage
+  if (req.url.path == "/") {
+    set req.url = querystring.remove(req.url);
+  }
+
+  # Serve from stale for 24 hours if origin is sick
+  set req.grace = 24h;
+
+  # Default backend.
+  set req.backend = F_origin;
+  set req.http.Fastly-Backend-Name = "origin";
+
+  %{ if contains(["staging", "production"], environment) ~}
+
+  # Save original request url because req.url changes after restarts.
+  if (req.restarts < 1) {
+    set req.http.original-url = req.url;
+  }
+  %{ endif ~}
+
+#FASTLY recv
+
+  if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
+    return(pass);
+  }
+
+  return(lookup);
+}
+
+sub vcl_fetch {
+#FASTLY fetch
+
+  set beresp.http.Fastly-Backend-Name = req.http.Fastly-Backend-Name;
+
+  if ((beresp.status >= 500 && beresp.status <= 599) && req.restarts < 3 && (req.request == "GET" || req.request == "HEAD") && !beresp.http.No-Fallback) {
+    set beresp.saintmode = 5s;
+    return (restart);
+  }
+
+  if (req.restarts == 0) {
+    # Keep stale for origin
+    set beresp.grace = 24h;
+  }
+
+  if(req.restarts > 0 ) {
+    set beresp.http.Fastly-Restarts = req.restarts;
+  }
+
+  if (beresp.http.Cache-Control ~ "private") {
+    return (pass);
+  }
+
+  if (beresp.http.Cache-Control ~ "max-age=0") {
+    return (pass);
+  }
+
+  if (beresp.http.Cache-Control ~ "no-(store|cache)") {
+    return (pass);
+  }
+
+  if (beresp.status == 500 || beresp.status == 503) {
+    set beresp.ttl = 1s;
+    set beresp.grace = 5s;
+    return (deliver);
+  }
+
+  if (beresp.http.Expires || beresp.http.Surrogate-Control ~ "max-age" || beresp.http.Cache-Control ~"(s-maxage|max-age)") {
+    # keep the ttl here
+  } else {
+    # apply the default ttl
+    set beresp.ttl = ${default_ttl}s;
+  }
+}
+
+sub vcl_hit {
+#FASTLY hit
+}
+
+sub vcl_miss {
+#FASTLY miss
+}
+
+sub vcl_deliver {
+#FASTLY deliver
+}
+
+sub vcl_error {
+  if (obj.status == 801) {
+    set obj.status = 301;
+    set obj.response = "Moved Permanently";
+    set obj.http.Location = "https://" req.http.host req.url;
+    synthetic {""};
+    return (deliver);
+  }
+
+  ${indent(2, file("${module_path}/../shared/_security_txt_response.vcl"))}
+
+  # Serve stale from error subroutine as recommended in:
+  # https://docs.fastly.com/guides/performance-tuning/serving-stale-content
+  # The use of `req.restarts == 0` condition is to enforce the restriction
+  # of serving stale only when the backend is the origin.
+  if ((req.restarts == 0) && (obj.status >= 500 && obj.status < 600)) {
+    /* deliver stale object if it is available */
+    if (stale.exists) {
+      return(deliver_stale);
+    }
+  }
+
+  # Assume we've hit vcl_error() because the backend is unavailable
+  if (req.restarts < 2) {
+    return (restart);
+  }
+
+  synthetic {"
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Welcome to Find open data - data.gov.uk</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; }
+          header { background: black; }
+          h1 { color: white; font-size: 29px; margin: 0 auto; padding: 10px; max-width: 990px; }
+          p { color: black; margin: 30px auto; max-width: 990px; }
+        </style>
+      </head>
+      <body>
+        <header><h1>Find open data - data.gov.uk</h1></header>
+        <p>We're experiencing technical difficulties. Please try again later.</p>
+      </body>
+    </html>"};
+
+  return (deliver);
+
+#FASTLY error
+}
+
+sub vcl_pass {
+#FASTLY pass
+}
+
+sub vcl_hash {
+#FASTLY hash
+}

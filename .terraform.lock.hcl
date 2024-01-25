@@ -6,6 +6,7 @@ provider "registry.terraform.io/fastly/fastly" {
   constraints = "5.3.1"
   hashes = [
     "h1:J/H5WvnjYggHWfzlpiMaMUblgjzaE5MPydM0aOCLV/c=",
+    "h1:OZFGLNoSydPR9FGVZop9704nJRZRjM65FRq6RmZIFFM=",
     "zh:1a5d0cd333f66aa0df26000e945df7678b045a8740921cc08f3e74412893d4f4",
     "zh:29d9728b0195d8e16dd31816d75a5ed069b0524d5e50b04a6533f0b9177895f7",
     "zh:2da9a3ecc0d5e3a66cb0cb5001b0c853ae22490204cc15fa14c44bbb848fcbc6",
@@ -27,6 +28,7 @@ provider "registry.terraform.io/hashicorp/http" {
   version     = "3.4.0"
   constraints = "3.4.0"
   hashes = [
+    "h1:AaRLrzxA1t02OIwO32uLp85npqRLZSwPFgrHxb9qp0c=",
     "h1:m0d6+9xK/9TJSE9Z6nM4IwHXZgod4/jkdsf7CZSpUvo=",
     "zh:56712497a87bc4e91bbaf1a5a2be4b3f9cfa2384baeb20fc9fad0aff8f063914",
     "zh:6661355e1090ebacab16a40ede35b029caffc279d67da73a000b6eecf0b58eba",

@@ -126,11 +126,6 @@ sub vcl_fetch {
 
   set beresp.http.Fastly-Backend-Name = req.http.Fastly-Backend-Name;
 
-  if ((beresp.status >= 500 && beresp.status <= 599) && req.restarts < 3 && (req.request == "GET" || req.request == "HEAD") && !beresp.http.No-Fallback) {
-    set beresp.saintmode = 5s;
-    return (restart);
-  }
-
   if (req.restarts == 0) {
     # Keep stale for origin
     set beresp.grace = 24h;
@@ -198,11 +193,6 @@ sub vcl_error {
     if (stale.exists) {
       return(deliver_stale);
     }
-  }
-
-  # Assume we've hit vcl_error() because the backend is unavailable
-  if (req.restarts < 2) {
-    return (restart);
   }
 
   synthetic {"

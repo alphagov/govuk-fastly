@@ -13,3 +13,11 @@ module "datagovuk-integration" {
 
   secrets = yamldecode(var.datagovuk_integration)
 }
+
+variable "datagovuk_staging" {
+  type = string
+}
+
+variable "datagovuk_production" {
+  type = string
+}

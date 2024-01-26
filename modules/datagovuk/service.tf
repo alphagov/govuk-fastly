@@ -106,6 +106,12 @@ resource "fastly_service_vcl" "service" {
     response_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect response condition"
   }
 
+  response_object {
+    name              = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect synthetic response"
+    status            = 301
+    request_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect request condition"
+  }
+
   request_setting {
     name      = "Force TLS"
     force_ssl = true

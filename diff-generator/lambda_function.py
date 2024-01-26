@@ -33,6 +33,8 @@ def generate_unified_diff(vcls):
   for address in vcls:
     vcl = vcls[address]
     before = vcl['before']
+    if 'after' not in vcl:
+      continue
     after = vcl['after']
     diff_gen = unified_diff(
       before.split("\n"),

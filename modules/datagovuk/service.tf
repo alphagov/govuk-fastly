@@ -44,8 +44,12 @@ resource "fastly_service_vcl" "service" {
   name    = "${title(local.template_values["environment"])} data.gov.uk"
   comment = ""
 
-  domain {
-    name = local.template_values["hostname"]
+  dynamic "domain" {
+    for_each = lookup(local.template_values, "hostnames", [])
+    iterator = each
+    content {
+      name = each.value
+    }
   }
 
   vcl {
@@ -91,6 +95,26 @@ resource "fastly_service_vcl" "service" {
       ssl_client_key    = ""
       override_host     = each.value.address
     }
+  }
+
+  header {
+    name               = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect location header"
+    action             = "set"
+    type               = "response"
+    destination        = "http.Location"
+    source             = "\"https://www.${local.template_values["environment"]}.data.gov.uk\" + req.url"
+    response_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect response condition"
+  }
+
+  response_object {
+    name              = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect synthetic response"
+    status            = 301
+    request_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect request condition"
+  }
+
+  request_setting {
+    name      = "Force TLS"
+    force_ssl = true
   }
 
   dynamic "logging_splunk" {

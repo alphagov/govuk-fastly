@@ -1,4 +1,4 @@
-backend F_origin {
+backend F_cname_find_eks_${environment}_govuk_digital {
     .connect_timeout = 5s;
     .dynamic = true;
     .port = "${origin_port}";
@@ -98,7 +98,7 @@ sub vcl_recv {
   }
 
   # Serve from stale for 24 hours if origin is sick
-  set req.grace = 24h;
+  set req.max_stale_if_error = 24h;
 
   # Default backend.
   set req.backend = F_origin;
@@ -126,14 +126,9 @@ sub vcl_fetch {
 
   set beresp.http.Fastly-Backend-Name = req.http.Fastly-Backend-Name;
 
-  if ((beresp.status >= 500 && beresp.status <= 599) && req.restarts < 3 && (req.request == "GET" || req.request == "HEAD") && !beresp.http.No-Fallback) {
-    set beresp.saintmode = 5s;
-    return (restart);
-  }
-
   if (req.restarts == 0) {
     # Keep stale for origin
-    set beresp.grace = 24h;
+    set beresp.stale_if_error = 24h;
   }
 
   if(req.restarts > 0 ) {
@@ -154,7 +149,7 @@ sub vcl_fetch {
 
   if (beresp.status == 500 || beresp.status == 503) {
     set beresp.ttl = 1s;
-    set beresp.grace = 5s;
+    set beresp.stale_if_error = 5s;
     return (deliver);
   }
 
@@ -200,11 +195,6 @@ sub vcl_error {
     }
   }
 
-  # Assume we've hit vcl_error() because the backend is unavailable
-  if (req.restarts < 2) {
-    return (restart);
-  }
-
   synthetic {"
     <!DOCTYPE html>
     <html>
@@ -230,8 +220,4 @@ sub vcl_error {
 
 sub vcl_pass {
 #FASTLY pass
-}
-
-sub vcl_hash {
-#FASTLY hash
 }

@@ -97,6 +97,15 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
+  header {
+    name               = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect location header"
+    action             = "set"
+    type               = "response"
+    destination        = "http.Location"
+    source             = "\"https://www.${local.template_values["environment"]}.data.gov.uk\" + req.url"
+    response_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect response condition"
+  }
+
   dynamic "logging_splunk" {
     for_each = {
       for splunk in lookup(var.secrets, "splunk", []) : splunk.name => splunk

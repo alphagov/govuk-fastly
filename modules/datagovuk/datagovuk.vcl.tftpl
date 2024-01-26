@@ -101,7 +101,7 @@ sub vcl_recv {
   set req.max_stale_if_error = 24h;
 
   # Default backend.
-  set req.backend = F_origin;
+  set req.backend = F_cname_find_eks_${environment}_govuk_digital;
   set req.http.Fastly-Backend-Name = "origin";
 
   %{ if contains(["staging", "production"], environment) ~}

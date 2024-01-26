@@ -106,6 +106,11 @@ resource "fastly_service_vcl" "service" {
     response_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect response condition"
   }
 
+  request_setting {
+    name      = "Force TLS"
+    force_ssl = true
+  }
+
   dynamic "logging_splunk" {
     for_each = {
       for splunk in lookup(var.secrets, "splunk", []) : splunk.name => splunk

@@ -26,9 +26,9 @@ findutrnumbervideolinks_percentages:
   B: 50
   Z: 0
 vertexsearch_percentages:
-  A: 10
-  B: 10
-  Z: 80
+  A: 0
+  B: 0
+  Z: 100
 savideostopselfemployed2_percentages:
   A: 50
   B: 50

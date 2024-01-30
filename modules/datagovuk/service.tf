@@ -71,32 +71,6 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
-  dynamic "backend" {
-    for_each = {
-      for b in lookup(local.template_values, "backends", []) : b.name => b
-    }
-    iterator = each
-    content {
-      name              = each.key
-      address           = each.value.address
-      use_ssl           = true
-      request_condition = lookup(each.value, "request_condition", "")
-      port              = lookup(each.value, "port", 443)
-      ssl_cert_hostname = each.value.address
-      ssl_sni_hostname  = each.value.address
-      shield            = lookup(each.value, "shield", "london-uk")
-      keepalive_time    = 0
-      healthcheck       = ""
-      max_tls_version   = ""
-      min_tls_version   = ""
-      ssl_ca_cert       = ""
-      ssl_ciphers       = ""
-      ssl_client_cert   = ""
-      ssl_client_key    = ""
-      override_host     = each.value.address
-    }
-  }
-
   header {
     name               = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect location header"
     action             = "set"

@@ -86,10 +86,17 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
-  response_object {
-    name              = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect synthetic response"
-    status            = 301
-    request_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect request condition"
+  dynamic "response_object" {
+    for_each = {
+      for c in lookup(local.template_values, "response_objects", []) : c.name => c
+    }
+    iterator = each
+    content {
+      name = each.key
+      status = each.value.status
+      request_condition = each.value.request_condition
+
+    }
   }
 
   request_setting {

@@ -20,9 +20,9 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 vertexsearch_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 50
+  B: 50
+  Z: 0
 savideostopselfemployed2_percentages:
   A: 50
   B: 50

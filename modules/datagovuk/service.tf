@@ -71,19 +71,32 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
-  header {
-    name               = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect location header"
-    action             = "set"
-    type               = "response"
-    destination        = "http.Location"
-    source             = "\"https://www.${local.template_values["environment"]}.data.gov.uk\" + req.url"
-    response_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect response condition"
+  dynamic "header" {
+    for_each = {
+      for c in lookup(local.template_values, "headers", []) : c.name => c
+    }
+    iterator = each
+    content {
+      name = each.key
+      action = each.value.action
+      type = each.value.type
+      destination = each.value.destination
+      source = each.value.source
+      response_condition = each.value.response_condition
+    }
   }
 
-  response_object {
-    name              = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect synthetic response"
-    status            = 301
-    request_condition = "${local.template_values["environment"]}.data.gov.uk to www.${local.template_values["environment"]}.data.gov.uk redirect request condition"
+  dynamic "response_object" {
+    for_each = {
+      for c in lookup(local.template_values, "response_objects", []) : c.name => c
+    }
+    iterator = each
+    content {
+      name = each.key
+      status = each.value.status
+      request_condition = each.value.request_condition
+
+    }
   }
 
   request_setting {

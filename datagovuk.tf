@@ -33,3 +33,15 @@ module "datagovuk-staging" {
 variable "datagovuk_production" {
   type = string
 }
+
+module "datagovuk-production" {
+  source = "./modules/datagovuk"
+
+  configuration = {
+    environment = "production"
+    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe = "/"
+  }
+
+  secrets = yamldecode(var.datagovuk_production)
+}

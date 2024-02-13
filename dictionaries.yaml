@@ -2,16 +2,10 @@ active_ab_tests:
   Example: true
   BankHolidaysTest: true
   VertexSearch: true
-  SAVideoStopSelfEmployed2: true
-  SAVideoReturn2: true
-  ReadyReckonerVideoTest2: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
   VertexSearch: 86400
-  SAVideoStopSelfEmployed2: 7776000 # 90 days
-  SAVideoReturn2: 7776000 # 90 days
-  ReadyReckonerVideoTest2: 7776000 # 90 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -20,18 +14,6 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 vertexsearch_percentages:
-  A: 50
-  B: 50
-  Z: 0
-savideostopselfemployed2_percentages:
-  A: 50
-  B: 50
-  Z: 0
-savideoreturn2_percentages:
-  A: 50
-  B: 50
-  Z: 0
-readyreckonervideotest2_percentages:
   A: 50
   B: 50
   Z: 0

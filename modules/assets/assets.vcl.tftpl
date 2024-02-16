@@ -270,7 +270,7 @@ sub vcl_fetch {
 
   if (req.restarts == 0) {
     # Keep stale for origin
-    set beresp.grace = 24h;
+    set beresp.stale_if_error = 24h;
   }
 
   if(req.restarts > 0 ) {
@@ -291,7 +291,7 @@ sub vcl_fetch {
 
   if (beresp.status >= 500 && beresp.status <= 599) {
     set beresp.ttl = 1s;
-    set beresp.grace = 5s;
+    set beresp.stale_if_error = 5s;
     if (beresp.http.Fastly-Backend-Name ~ "mirrorS3") {
       error 503 "Error page";
     }

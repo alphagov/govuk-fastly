@@ -190,7 +190,7 @@ sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
   # Serve from stale for 24 hours if origin is sick
-  set req.grace = 24h;
+  set req.max_stale_if_error = 24h;
 
   # Default backend.
   set req.backend = F_awsorigin;
@@ -208,7 +208,7 @@ sub vcl_recv {
     set req.url = req.http.original-url;
 
     # Don't serve from stale for mirrors
-    set req.grace = 0s;
+    set req.max_stale_if_error = 0s;
     set req.http.Fastly-Failover = "1";
 
     # Replace multiple /

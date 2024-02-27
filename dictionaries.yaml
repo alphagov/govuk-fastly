@@ -13,7 +13,4 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
-vertexsearch_percentages:
-  A: 50
-  B: 50
-  Z: 0
+

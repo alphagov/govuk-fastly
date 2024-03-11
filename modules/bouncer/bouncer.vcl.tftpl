@@ -48,7 +48,7 @@ sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
   # Serve from stale for 24 hours if origin is sick
-  set req.grace = 24h;
+  set req.max_stale_if_error = 24h;
 
   # Default backend.
   set req.backend = F_origin0;
@@ -73,7 +73,7 @@ sub vcl_fetch {
 #FASTLY fetch
 
 
-  set beresp.grace = 86400s;
+  set beresp.stale_if_error = 86400s;
 
   if ((beresp.status == 500 || beresp.status == 503) && req.restarts < 2 && (req.request == "GET" || req.request == "HEAD")) {
     set beresp.saintmode = 5s;
@@ -94,7 +94,7 @@ sub vcl_fetch {
 
   if (beresp.status == 500 || beresp.status == 503) {
     set beresp.ttl = 1s;
-    set beresp.grace = 5s;
+    set beresp.stale_if_error = 5s;
     return (deliver);
   }
 

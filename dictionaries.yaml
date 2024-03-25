@@ -1,11 +1,9 @@
 active_ab_tests:
   Example: true
   BankHolidaysTest: true
-  VertexSearch: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  VertexSearch: 86400
 # AB test percentages
 example_percentages:
   A: 50

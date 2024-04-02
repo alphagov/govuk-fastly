@@ -30,6 +30,8 @@ module "datagovuk-staging" {
   }
 
   secrets = yamldecode(var.datagovuk_staging)
+
+  dictionaries = local.dictionaries
 }
 
 variable "datagovuk_production" {
@@ -46,4 +48,6 @@ module "datagovuk-production" {
   }
 
   secrets = yamldecode(var.datagovuk_production)
+
+  dictionaries = local.dictionaries
 }

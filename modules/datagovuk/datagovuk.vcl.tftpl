@@ -39,6 +39,11 @@ backend F_cname_find_eks_${environment}_govuk_digital {
 sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
+  # Serve 404 if source IP/netblock is denylisted.
+  if (table.lookup(ip_address_denylist, client.ip)) {
+    error 404 "Not Found";
+  }
+
   # Require authentication for PURGE requests
   set req.http.Fastly-Purge-Requires-Auth = "1";
 

@@ -58,6 +58,11 @@ resource "fastly_service_vcl" "service" {
     content = templatefile("${path.module}/${var.vcl_template_file}", local.template_values)
   }
 
+  dynamic "dictionary" {
+    for_each = var.dictionaries
+    content { name = dictionary.key }
+  }
+
   dynamic "condition" {
     for_each = {
       for c in lookup(local.template_values, "conditions", []) : c.name => c
@@ -160,4 +165,14 @@ resource "fastly_service_vcl" "service" {
       ))
     }
   }
+}
+
+resource "fastly_service_dictionary_items" "items" {
+  for_each = {
+    for d in fastly_service_vcl.service.dictionary : d.name => d
+  }
+  service_id    = fastly_service_vcl.service.id
+  dictionary_id = each.value.dictionary_id
+  items         = var.dictionaries[each.key]
+  manage_items  = true
 }

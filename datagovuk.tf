@@ -12,6 +12,8 @@ module "datagovuk-integration" {
   }
 
   secrets = yamldecode(var.datagovuk_integration)
+
+  dictionaries = local.dictionaries
 }
 
 variable "datagovuk_staging" {

@@ -31,6 +31,7 @@ locals {
       gcs_mirror_probe           = null
       gcs_mirror_port            = 443
 
+      private_extra_vcl_recv = ""
       ab_tests = []
     },
     { # computed values

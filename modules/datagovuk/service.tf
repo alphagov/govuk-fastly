@@ -30,6 +30,8 @@ locals {
       gcs_mirror_prefix = null
       gcs_mirror_probe = null
       gcs_mirror_port = 443
+
+      private_extra_vcl_recv = ""
     },
     { # computed values
       formatted_allowed_ip_addresses = local.formatted_allowed_ips

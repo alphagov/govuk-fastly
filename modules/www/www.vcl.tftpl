@@ -199,6 +199,10 @@ sub vcl_recv {
   if (!req.http.Fastly-SSL) {
      error 801 "Force SSL";
   }
+  
+  %{ if private_extra_vcl_recv != "" ~}
+    ${private_extra_vcl_recv}
+  %{ endif ~}
 
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 

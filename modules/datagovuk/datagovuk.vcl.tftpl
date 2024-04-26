@@ -39,6 +39,15 @@ backend F_cname_find_eks_${environment}_govuk_digital {
 sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
+  if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
+    set req.http.Client-JA3 = tls.client.ja3_md5;
+
+    # Block requests that match a known bad signature
+    if (table.lookup(ja3_signature_denylist, req.http.Client-JA3, "false") == "true") {
+      error 403 "Forbidden";
+    }
+  }
+
   # Serve 404 if source IP/netblock is denylisted.
   if (table.lookup(ip_address_denylist, client.ip)) {
     error 404 "Not Found";

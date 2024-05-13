@@ -5,7 +5,7 @@ active_ab_tests:
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  NewBrowse: 86400 # 1 day
+  NewBrowse: 864000 # 10 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -14,6 +14,6 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 newbrowse_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 95
+  B: 5
+  Z: 0

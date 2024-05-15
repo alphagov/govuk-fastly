@@ -199,6 +199,14 @@ sub vcl_recv {
   if (!req.http.Fastly-SSL) {
      error 801 "Force SSL";
   }
+
+  # Temporary if statement to test changes before going to production:
+  %{ if environment == "integration" }
+  # Reject HTTP requests which don't use a standard method
+  if (req.method !~ "^(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|FASTLYPURGE)") {
+    error 805 "Method not allowed";
+  }
+  %{ endif ~}
   
   %{ if private_extra_vcl_recv != "" ~}
     ${private_extra_vcl_recv}
@@ -537,6 +545,32 @@ sub vcl_error {
     set obj.status = 404;
     set obj.response = "Not Found";
     set obj.http.Fastly-Backend-Name = "force_not_found";
+
+    synthetic {"
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Welcome to GOV.UK</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; }
+            header { background: black; }
+            h1 { color: white; font-size: 29px; margin: 0 auto; padding: 10px; max-width: 990px; }
+            p { color: black; margin: 30px auto; max-width: 990px; }
+          </style>
+        </head>
+        <body>
+          <header><h1>GOV.UK</h1></header>
+          <p>We cannot find the page you're looking for. Please try searching on <a href="https://www.gov.uk/">GOV.UK</a>.</p>
+        </body>
+      </html>"};
+
+    return (deliver);
+  }
+
+  if (obj.status == 805) {
+    set obj.status = 405;
+    set obj.response = "Method not allowed";
+    set obj.http.Fastly-Backend-Name = "force_method_not_allowed";
 
     synthetic {"
       <!DOCTYPE html>

@@ -14,6 +14,6 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 newbrowse_percentages:
-  A: 95
-  B: 5
+  A: 50
+  B: 50
   Z: 0

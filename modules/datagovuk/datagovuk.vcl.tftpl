@@ -164,11 +164,13 @@ sub vcl_fetch {
     return (pass);
   }
 
-  if (beresp.status == 500 || beresp.status == 503) {
-    set beresp.ttl = 1s;
-    set beresp.stale_if_error = 5s;
-    return (deliver);
-  }
+  %{ if environment != "integration"}
+    if (beresp.status == 500 || beresp.status == 503) {
+      set beresp.ttl = 1s;
+      set beresp.stale_if_error = 5s;
+      return (deliver);
+    }
+  %{ endif ~}
 
   if (beresp.http.Expires || beresp.http.Surrogate-Control ~ "max-age" || beresp.http.Cache-Control ~"(s-maxage|max-age)") {
     # keep the ttl here

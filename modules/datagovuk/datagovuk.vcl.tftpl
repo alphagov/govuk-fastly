@@ -125,7 +125,7 @@ sub vcl_recv {
 
 sub vcl_fetch {
 #FASTLY fetch
-  %{ if environment == "integration"}
+  %{ if contains(["integration"], environment) ~}
     if (beresp.status >= 500 && beresp.status < 600) {
       
       if (stale.exists) {
@@ -164,7 +164,7 @@ sub vcl_fetch {
     return (pass);
   }
 
-  %{ if environment != "integration"}
+  %{ if contains(["staging", "production"], environment) ~}
     if (beresp.status == 500 || beresp.status == 503) {
       set beresp.ttl = 1s;
       set beresp.stale_if_error = 5s;

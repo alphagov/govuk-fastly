@@ -1,7 +1,3 @@
-variable "bouncer_production" {
-  type = string
-}
-
 module "bouncer-production" {
   source = "./modules/bouncer"
 

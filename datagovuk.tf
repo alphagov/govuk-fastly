@@ -1,7 +1,3 @@
-variable "datagovuk_integration" {
-  type = string
-}
-
 module "datagovuk-integration" {
   source = "./modules/datagovuk"
 
@@ -16,10 +12,6 @@ module "datagovuk-integration" {
   dictionaries = local.dictionaries
 }
 
-variable "datagovuk_staging" {
-  type = string
-}
-
 module "datagovuk-staging" {
   source = "./modules/datagovuk"
 
@@ -32,10 +24,6 @@ module "datagovuk-staging" {
   secrets = yamldecode(var.datagovuk_staging)
 
   dictionaries = local.dictionaries
-}
-
-variable "datagovuk_production" {
-  type = string
 }
 
 module "datagovuk-production" {

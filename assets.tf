@@ -1,7 +1,3 @@
-variable "assets_integration" {
-  type = string
-}
-
 module "assets-integration" {
   source = "./modules/assets"
 
@@ -16,10 +12,6 @@ module "assets-integration" {
   dictionaries = local.dictionaries
 }
 
-variable "assets_staging" {
-  type = string
-}
-
 module "assets-staging" {
   source = "./modules/assets"
 
@@ -32,10 +24,6 @@ module "assets-staging" {
   secrets = yamldecode(var.assets_staging)
 
   dictionaries = local.dictionaries
-}
-
-variable "assets_production" {
-  type = string
 }
 
 module "assets-production" {

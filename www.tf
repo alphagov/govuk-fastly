@@ -2,10 +2,6 @@ locals {
   ab_tests = yamldecode(file("${path.module}/ab_tests.yaml"))
 }
 
-variable "www_integration" {
-  type = string
-}
-
 module "www-integration" {
   source = "./modules/www"
 
@@ -21,10 +17,6 @@ module "www-integration" {
   dictionaries = local.dictionaries
 }
 
-variable "www_staging" {
-  type = string
-}
-
 module "www-staging" {
   source = "./modules/www"
 
@@ -38,10 +30,6 @@ module "www-staging" {
   secrets = yamldecode(var.www_staging)
 
   dictionaries = local.dictionaries
-}
-
-variable "www_production" {
-  type = string
 }
 
 module "www-production" {

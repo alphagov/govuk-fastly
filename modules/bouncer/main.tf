@@ -32,6 +32,24 @@ resource "fastly_service_vcl" "service" {
     })
   }
 
+  rate_limiter {
+    name = "rate_limiter"
+
+    rps_limit            = 500
+    window_size          = 10
+    penalty_box_duration = 5
+
+    client_key   = "req.http.Fastly-Client-IP"
+    http_methods = "GET,PUT,TRACE,POST,HEAD,DELETE,PATCH,OPTIONS"
+
+    action = "response"
+    response {
+      content      = "Too many requests"
+      content_type = "plain/text"
+      status       = 429
+    }
+  }
+
   dynamic "logging_s3" {
     for_each = {
       for s3 in lookup(var.secrets, "s3", []) : s3.name => s3

@@ -7,8 +7,8 @@ module "datagovuk-integration" {
 
   configuration = {
     environment = "integration"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
+    git_hash    = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe       = "/"
   }
 
   secrets = yamldecode(var.datagovuk_integration)
@@ -25,8 +25,8 @@ module "datagovuk-staging" {
 
   configuration = {
     environment = "staging"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
+    git_hash    = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe       = "/"
   }
 
   secrets = yamldecode(var.datagovuk_staging)
@@ -43,8 +43,8 @@ module "datagovuk-production" {
 
   configuration = {
     environment = "production"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
+    git_hash    = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe       = "/"
   }
 
   secrets = yamldecode(var.datagovuk_production)

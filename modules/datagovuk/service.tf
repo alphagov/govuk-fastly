@@ -8,34 +8,34 @@ locals {
   ]
   template_values = merge(
     { # some defaults
-      origin_port = 443
-      minimum_tls_version = "1.2"
-      ssl_ciphers = "ECDHE-RSA-AES256-GCM-SHA384"
+      origin_port          = 443
+      minimum_tls_version  = "1.2"
+      ssl_ciphers          = "ECDHE-RSA-AES256-GCM-SHA384"
       basic_authentication = null
-      probe_dns_only = true
+      probe_dns_only       = true
 
       # these values are needed even if mirrors aren't enabled in an environment
-      s3_mirror_hostname = null
-      s3_mirror_prefix = null
-      s3_mirror_probe = null
-      s3_mirror_port = 443
+      s3_mirror_hostname         = null
+      s3_mirror_prefix           = null
+      s3_mirror_probe            = null
+      s3_mirror_port             = 443
       s3_mirror_replica_hostname = null
-      s3_mirror_replica_prefix = null
-      s3_mirror_replica_probe = null
-      s3_mirror_replica_port = 443
-      gcs_mirror_hostname = null
-      gcs_mirror_access_id = null
-      gcs_mirror_secret_key = null
-      gcs_mirror_bucket_name = null
-      gcs_mirror_prefix = null
-      gcs_mirror_probe = null
-      gcs_mirror_port = 443
+      s3_mirror_replica_prefix   = null
+      s3_mirror_replica_probe    = null
+      s3_mirror_replica_port     = 443
+      gcs_mirror_hostname        = null
+      gcs_mirror_access_id       = null
+      gcs_mirror_secret_key      = null
+      gcs_mirror_bucket_name     = null
+      gcs_mirror_prefix          = null
+      gcs_mirror_probe           = null
+      gcs_mirror_port            = 443
 
       private_extra_vcl_recv = ""
     },
     { # computed values
       formatted_allowed_ip_addresses = local.formatted_allowed_ips
-      module_path = "${path.module}"
+      module_path                    = "${path.module}"
     },
     var.configuration,
     var.secrets
@@ -55,8 +55,8 @@ resource "fastly_service_vcl" "service" {
   }
 
   vcl {
-    main = true
-    name = "main"
+    main    = true
+    name    = "main"
     content = templatefile("${path.module}/${var.vcl_template_file}", local.template_values)
   }
 
@@ -71,10 +71,10 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      priority = each.value.priority
+      name      = each.key
+      priority  = each.value.priority
       statement = each.value.statement
-      type = each.value.type
+      type      = each.value.type
     }
   }
 
@@ -84,11 +84,11 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      action = each.value.action
-      type = each.value.type
-      destination = each.value.destination
-      source = each.value.source
+      name               = each.key
+      action             = each.value.action
+      type               = each.value.type
+      destination        = each.value.destination
+      source             = each.value.source
       response_condition = each.value.response_condition
     }
   }
@@ -99,8 +99,8 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      status = each.value.status
+      name              = each.key
+      status            = each.value.status
       request_condition = each.value.request_condition
 
     }
@@ -131,10 +131,10 @@ resource "fastly_service_vcl" "service" {
         }
         EOT
       ))
-      tls_hostname = each.value.hostname
-      token        = each.value.token
-      url          = each.value.url
-      use_tls      = true
+      tls_hostname       = each.value.hostname
+      token              = each.value.token
+      url                = each.value.url
+      use_tls            = true
       response_condition = lookup(each.value, "response_condition", null)
     }
   }
@@ -145,19 +145,19 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      bucket_name = each.value.bucket_name
-      domain = each.value.domain
-      path = each.value.path
-      period = each.value.period
-      redundancy = each.value.redundancy
-      s3_access_key = each.value.access_key_id
-      s3_secret_key = each.value.secret_access_key
+      name               = each.key
+      bucket_name        = each.value.bucket_name
+      domain             = each.value.domain
+      path               = each.value.path
+      period             = each.value.period
+      redundancy         = each.value.redundancy
+      s3_access_key      = each.value.access_key_id
+      s3_secret_key      = each.value.secret_access_key
       response_condition = lookup(each.value, "response_condition", null)
 
-      format_version = 2
-      message_type = "blank"
-      gzip_level = 9
+      format_version   = 2
+      message_type     = "blank"
+      gzip_level       = 9
       timestamp_format = "%Y-%m-%dT%H:%M:%S.000"
 
       format = lookup(each.value, "format", chomp(

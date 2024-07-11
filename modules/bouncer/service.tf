@@ -2,23 +2,23 @@ data "http" "domains" {
   url = "https://transition.publishing.service.gov.uk/hosts.json"
 }
 
-locals {  
+locals {
   domains_json = jsondecode(data.http.domains.response_body)
   domains = {
-    for d in local.domains_json.results:
-      d.hostname => ""
+    for d in local.domains_json.results :
+    d.hostname => ""
   }
 }
 
 resource "fastly_service_vcl" "service" {
-  name = "${title(var.environment)} Bouncer"
+  name    = "${title(var.environment)} Bouncer"
   comment = ""
 
   dynamic "domain" {
     for_each = local.domains
     iterator = each
     content {
-      name = each.key
+      name    = each.key
       comment = ""
     }
   }
@@ -27,7 +27,7 @@ resource "fastly_service_vcl" "service" {
     main = true
     name = "main"
     content = templatefile("${path.module}/${var.vcl_template_file}", {
-      domain = var.domain,
+      domain      = var.domain,
       module_path = "${path.module}"
     })
   }
@@ -38,19 +38,19 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      bucket_name = each.value.bucket_name
-      domain = each.value.domain
-      path = each.value.path
-      period = each.value.period
-      redundancy = each.value.redundancy
-      s3_access_key = each.value.access_key_id
-      s3_secret_key = each.value.secret_access_key
+      name               = each.key
+      bucket_name        = each.value.bucket_name
+      domain             = each.value.domain
+      path               = each.value.path
+      period             = each.value.period
+      redundancy         = each.value.redundancy
+      s3_access_key      = each.value.access_key_id
+      s3_secret_key      = each.value.secret_access_key
       response_condition = lookup(each.value, "response_condition", null)
 
-      format_version = 2
-      message_type = "blank"
-      gzip_level = 9
+      format_version   = 2
+      message_type     = "blank"
+      gzip_level       = 9
       timestamp_format = "%Y-%m-%dT%H:%M:%S.000"
 
       format = lookup(each.value, "format", chomp(

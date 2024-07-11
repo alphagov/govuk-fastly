@@ -11,9 +11,9 @@ module "www-integration" {
 
   configuration = {
     environment = "integration"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
-    ab_tests = local.ab_tests
+    git_hash    = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe       = "/"
+    ab_tests    = local.ab_tests
   }
 
   secrets = yamldecode(var.www_integration)
@@ -30,9 +30,9 @@ module "www-staging" {
 
   configuration = {
     environment = "staging"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
-    ab_tests = local.ab_tests
+    git_hash    = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe       = "/"
+    ab_tests    = local.ab_tests
   }
 
   secrets = yamldecode(var.www_staging)
@@ -49,9 +49,9 @@ module "www-production" {
 
   configuration = {
     environment = "production"
-    git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
-    probe = "/"
-    ab_tests = local.ab_tests
+    git_hash    = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+    probe       = "/"
+    ab_tests    = local.ab_tests
   }
 
   secrets = yamldecode(var.www_production)

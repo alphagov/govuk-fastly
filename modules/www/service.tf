@@ -32,7 +32,7 @@ locals {
       gcs_mirror_port            = 443
 
       private_extra_vcl_recv = ""
-      ab_tests = []
+      ab_tests               = []
     },
     { # computed values
       formatted_allowed_ip_addresses = local.formatted_allowed_ips

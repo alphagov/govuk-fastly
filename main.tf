@@ -16,8 +16,8 @@ terraform {
 provider "fastly" {}
 
 variable "TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA" {
-  type = string
-  default = "unknown"
+  type        = string
+  default     = "unknown"
   description = "Git commit hash (automatically populated)"
 }
 

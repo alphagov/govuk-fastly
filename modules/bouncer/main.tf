@@ -28,7 +28,7 @@ resource "fastly_service_vcl" "service" {
     name = "main"
     content = templatefile("${path.module}/${var.vcl_template_file}", {
       domain      = var.domain,
-      module_path = "${path.module}"
+      module_path = path.module
     })
   }
 

@@ -35,7 +35,7 @@ locals {
     },
     { # computed values
       formatted_allowed_ip_addresses = local.formatted_allowed_ips
-      module_path                    = "${path.module}"
+      module_path                    = path.module
     },
     var.configuration,
     var.secrets

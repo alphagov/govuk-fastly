@@ -25,7 +25,7 @@ locals {
       gcs_mirror_port            = 443
     },
     { # computed values
-      module_path = "${path.module}"
+      module_path = path.module
     },
     var.configuration,
     var.secrets

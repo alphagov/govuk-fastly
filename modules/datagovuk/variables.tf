@@ -11,5 +11,6 @@ variable "dictionaries" {
 }
 
 variable "vcl_template_file" {
+  type    = string
   default = "datagovuk.vcl.tftpl"
 }

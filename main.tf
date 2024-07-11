@@ -5,25 +5,16 @@ terraform {
       name = "govuk-fastly"
     }
   }
+  required_version = "~> 1.7"
   required_providers {
     fastly = {
       source  = "fastly/fastly"
-      version = "5.3.1"
+      version = "5.11.0"
     }
   }
 }
 
 provider "fastly" {}
-
-variable "TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA" {
-  type = string
-  default = "unknown"
-  description = "Git commit hash (automatically populated)"
-}
-
-variable "dictionaries" {
-  type = string
-}
 
 locals {
   dictionaries = merge(

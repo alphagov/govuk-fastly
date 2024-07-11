@@ -1,31 +1,31 @@
 locals {
   template_values = merge(
     { # some defaults
-      aws_origin_port = 443
-      minimum_tls_version = "1.2"
-      ssl_ciphers = "ECDHE-RSA-AES256-GCM-SHA384"
+      aws_origin_port      = 443
+      minimum_tls_version  = "1.2"
+      ssl_ciphers          = "ECDHE-RSA-AES256-GCM-SHA384"
       basic_authentication = null
-      probe_dns_only = false
+      probe_dns_only       = false
 
       # these values are needed even if mirrors aren't enabled in an environment
-      s3_mirror_hostname = null
-      s3_mirror_prefix = null
-      s3_mirror_probe = null
-      s3_mirror_port = 443
+      s3_mirror_hostname         = null
+      s3_mirror_prefix           = null
+      s3_mirror_probe            = null
+      s3_mirror_port             = 443
       s3_mirror_replica_hostname = null
-      s3_mirror_replica_prefix = null
-      s3_mirror_replica_probe = null
-      s3_mirror_replica_port = 443
-      gcs_mirror_hostname = null
-      gcs_mirror_access_id = null
-      gcs_mirror_secret_key = null
-      gcs_mirror_bucket_name = null
-      gcs_mirror_prefix = null
-      gcs_mirror_probe = null
-      gcs_mirror_port = 443
+      s3_mirror_replica_prefix   = null
+      s3_mirror_replica_probe    = null
+      s3_mirror_replica_port     = 443
+      gcs_mirror_hostname        = null
+      gcs_mirror_access_id       = null
+      gcs_mirror_secret_key      = null
+      gcs_mirror_bucket_name     = null
+      gcs_mirror_prefix          = null
+      gcs_mirror_probe           = null
+      gcs_mirror_port            = 443
     },
     { # computed values
-      module_path = "${path.module}"
+      module_path = path.module
     },
     var.configuration,
     var.secrets
@@ -43,8 +43,8 @@ resource "fastly_service_vcl" "service" {
   }
 
   vcl {
-    main = true
-    name = "main"
+    main    = true
+    name    = "main"
     content = templatefile("${path.module}/${var.vcl_template_file}", local.template_values)
   }
 
@@ -54,10 +54,10 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      priority = each.value.priority
+      name      = each.key
+      priority  = each.value.priority
       statement = each.value.statement
-      type = each.value.type
+      type      = each.value.type
     }
   }
 
@@ -114,10 +114,10 @@ resource "fastly_service_vcl" "service" {
         }
         EOT
       ))
-      tls_hostname = each.value.hostname
-      token        = each.value.token
-      url          = each.value.url
-      use_tls      = true
+      tls_hostname       = each.value.hostname
+      token              = each.value.token
+      url                = each.value.url
+      use_tls            = true
       response_condition = lookup(each.value, "response_condition", null)
     }
   }
@@ -128,19 +128,19 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name = each.key
-      bucket_name = each.value.bucket_name
-      domain = each.value.domain
-      path = each.value.path
-      period = each.value.period
-      redundancy = each.value.redundancy
-      s3_access_key = each.value.access_key_id
-      s3_secret_key = each.value.secret_access_key
+      name               = each.key
+      bucket_name        = each.value.bucket_name
+      domain             = each.value.domain
+      path               = each.value.path
+      period             = each.value.period
+      redundancy         = each.value.redundancy
+      s3_access_key      = each.value.access_key_id
+      s3_secret_key      = each.value.secret_access_key
       response_condition = lookup(each.value, "response_condition", null)
 
-      format_version = 2
-      message_type = "blank"
-      gzip_level = 9
+      format_version   = 2
+      message_type     = "blank"
+      gzip_level       = 9
       timestamp_format = "%Y-%m-%dT%H:%M:%S.000"
 
       format = lookup(each.value, "format", chomp(
@@ -176,8 +176,8 @@ resource "fastly_service_dictionary_items" "items" {
   for_each = {
     for d in fastly_service_vcl.service.dictionary : d.name => d
   }
-  service_id = fastly_service_vcl.service.id
+  service_id    = fastly_service_vcl.service.id
   dictionary_id = each.value.dictionary_id
-  items = var.dictionaries[each.key]
-  manage_items = true
+  items         = var.dictionaries[each.key]
+  manage_items  = true
 }

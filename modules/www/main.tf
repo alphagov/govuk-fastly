@@ -110,7 +110,7 @@ resource "fastly_service_vcl" "service" {
   }
 
   rate_limiter {
-    name = "rate_limiter"
+    name = "rate_limiter_www_${local.template_values["environment"]}"
 
     rps_limit            = 500
     window_size          = 10

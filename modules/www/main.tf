@@ -14,6 +14,9 @@ locals {
       ssl_ciphers          = "ECDHE-RSA-AES256-GCM-SHA384"
       basic_authentication = null
 
+      s3_static_assets_port     = 443
+      s3_static_assets_hostname = null
+
       # these values are needed even if mirrors aren't enabled in an environment
       s3_mirror_hostname         = null
       s3_mirror_prefix           = null

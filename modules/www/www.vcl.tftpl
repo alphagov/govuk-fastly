@@ -36,6 +36,32 @@ backend F_origin {
 %{ endif ~}
 }
 
+backend F_staticAssetsS3 {
+    .connect_timeout = 1s;
+    .dynamic = true;
+    .port = "${s3_static_assets_port}";
+    .host = "${s3_static_assets_hostname}";
+    .first_byte_timeout = 15s;
+    .max_connections = 200;
+    .between_bytes_timeout = 10s;
+
+    .ssl = true;
+    .ssl_check_cert = always;
+    .min_tls_version = "${minimum_tls_version}";
+    .ssl_ciphers = "${ssl_ciphers}";
+    .ssl_cert_hostname = "${s3_static_assets_hostname}";
+    .ssl_sni_hostname = "${s3_static_assets_hostname}";
+
+    .probe = {
+        .dummy = ${probe_dns_only};
+        .threshold = 1;
+        .window = 2;
+        .timeout = 5s;
+        .initial = 1;
+        .interval = ${probe_interval};
+    }
+}
+
 %{ if contains(["staging", "production"], environment) ~}
 # Mirror backend for S3
 backend F_mirrorS3 {
@@ -342,6 +368,12 @@ sub vcl_recv {
     unset req.http.Cookie;
   }
 
+  if (req.url.path ~ "^\/assets(\/.*)?\z") {
+    set req.backend = F_staticAssetsS3;
+    set req.http.host = "${s3_static_assets_hostname}";
+    set req.http.Fastly-Backend-Name = "staticAssetsS3";
+  }
+
   return(lookup);
 }
 
@@ -433,7 +465,22 @@ sub vcl_fetch {
       set beresp.ttl = 900s;
       set beresp.http.Cache-Control = "max-age=900";
     }
+
+    # Static Assets S3 bucket do not set cache headers by default. Override TTL and add cache-control to 31536000s.
+    # Strip out common S3 headers
+    if (beresp.http.Fastly-Backend-Name ~ "^staticAssetsS3$") {
+      set beresp.ttl = 31536000s;
+      set beresp.http.Cache-Control = "max-age=31536000, public, immutable";
+      set beresp.http.Access-Control-Allow-Origin = "*";
+
+      unset beresp.http.x-amz-id-2;
+      unset beresp.http.x-amz-meta-server-side-encryption;
+      unset beresp.http.x-amz-request-id;
+      unset beresp.http.x-amz-version-id;
+      unset beresp.http.x-amz-server-side-encryption;
+    }
   }
+
   # Strip cookies from outbound requests. Corresponding rule in vcl_recv{}
   if (req.url !~ "^/(apply-for-a-licence|email|sign-in/callback)") {
     unset beresp.http.Set-Cookie;

@@ -372,6 +372,9 @@ sub vcl_recv {
     set req.backend = F_staticAssetsS3;
     set req.http.host = "${s3_static_assets_hostname}";
     set req.http.Fastly-Backend-Name = "staticAssetsS3";
+    %{ if basic_authentication != null ~}
+        unset req.http.Authorization;
+    %{ endif ~}
   }
 
   return(lookup);

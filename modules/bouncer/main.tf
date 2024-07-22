@@ -35,7 +35,7 @@ resource "fastly_service_vcl" "service" {
   rate_limiter {
     name = "rate_limiter_bouncer"
 
-    rps_limit            = 500
+    rps_limit            = 100
     window_size          = 10
     penalty_box_duration = 5
 

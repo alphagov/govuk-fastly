@@ -213,7 +213,7 @@ resource "fastly_service_vcl" "service" {
     }
     iterator = each
     content {
-      name         = each.value.key
+      name         = each.key
       dataset      = "fastly_logs"
       table        = "fastly_logs"
       project_id   = each.value.project_id

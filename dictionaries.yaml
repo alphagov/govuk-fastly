@@ -5,7 +5,7 @@ active_ab_tests:
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  PopularTasks: 172800 # 2 days
+  PopularTasks: 7862400 # 91 days/ 3 months avg
 # AB test percentages
 example_percentages:
   A: 50
@@ -14,7 +14,7 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 populartasks_percentages:
-  A: 10
-  B: 10
-  C: 10
-  Z: 70
+  A: 33
+  B: 33
+  C: 33
+  Z: 1

@@ -206,6 +206,40 @@ resource "fastly_service_vcl" "service" {
       ))
     }
   }
+
+  dynamic "logging_bigquery" {
+    for_each = {
+      for bigquery in try(var.secrets["bigquery"], []) : bigquery.name => bigquery
+    }
+
+    content {
+      name         = each.value.key
+      dataset      = "fastly_logs"
+      table        = "fastly_logs"
+      project_id   = each.value.project_id
+      account_name = "fastly-bigquery-writer"
+
+      format = try(each.value["format"], chomp(
+        <<-EOT
+        {
+          "client_ip":"%%{json.escape(client.ip)}V",
+          "request_received":"%%{%Y-%m-%d %H:%M:%S %Z}t",
+          "method":"%%{json.escape(req.method)}V",
+          "url":"%%{json.escape(req.url)}V",
+          "status":%>s,
+          "protocol":"%%{json.escape(req.proto)}V",
+          "bytes":%B,
+          "content_type":"%%{json.escape(resp.http.Content-Type)}V",
+          "user_agent":"%%{json.escape(req.http.User-Agent)}V",
+          "fastly_backend":"%%{json.escape(resp.http.Fastly-Backend-Name)}V",
+          "cache_response":"%%{fastly_info.state}V",
+          "tls_client_protocol":"%%{json.escape(tls.client.protocol)}V",
+          "tls_client_cipher":"%%{json.escape(tls.client.cipher)}V"
+        }
+        EOT
+      ))
+    }
+  }
 }
 
 resource "fastly_service_dictionary_items" "items" {

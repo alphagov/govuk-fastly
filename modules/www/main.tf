@@ -211,7 +211,7 @@ resource "fastly_service_vcl" "service" {
     for_each = {
       for bigquery in try(var.secrets["bigquery"], []) : bigquery.name => bigquery
     }
-
+    iterator = each
     content {
       name         = each.value.key
       dataset      = "fastly_logs"

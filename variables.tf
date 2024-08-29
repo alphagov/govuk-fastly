@@ -38,18 +38,6 @@ variable "www_production" {
   type = string
 }
 
-variable "chat_integration" {
-  type = string
-}
-
-variable "chat_staging" {
-  type = string
-}
-
-variable "chat_production" {
-  type = string
-}
-
 variable "TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA" {
   type        = string
   default     = "unknown"

@@ -225,6 +225,11 @@ sub vcl_recv {
   if (!req.http.Fastly-SSL) {
      error 801 "Force SSL";
   }
+
+  # Reject unimplemented and non-standard HTTP methods
+  if (req.method !~ "^(GET|HEAD|POST|PUT|DELETE|OPTIONS|PATCH|FASTLYPURGE)") {
+    error 806 "Not Implemented";
+  }
   
   %{ if private_extra_vcl_recv != "" ~}
     ${private_extra_vcl_recv}
@@ -608,6 +613,32 @@ sub vcl_error {
 
     return (deliver);
   }
+
+  if (obj.status == 806) {
+        set obj.status = 501;
+        set obj.response = "Not Implemented";
+        set obj.http.Fastly-Backend-Name = "force_not_implemented";
+
+        synthetic {"
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Welcome to GOV.UK</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 0; }
+                header { background: black; }
+                h1 { color: white; font-size: 29px; margin: 0 auto; padding: 10px; max-width: 990px; }
+                p { color: black; margin: 30px auto; max-width: 990px; }
+              </style>
+            </head>
+            <body>
+              <header><h1>GOV.UK</h1></header>
+              <p>We cannot find the page you're looking for. Please try searching on <a href="https://www.gov.uk/">GOV.UK</a>.</p>
+            </body>
+          </html>"};
+
+        return (deliver);
+      }
 
   ${indent(2, file("${module_path}/../shared/_security_txt_response.vcl"))}
 

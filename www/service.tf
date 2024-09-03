@@ -1,4 +1,5 @@
 locals {
+  secrets      = yamldecode(var.secrets)
   ip_allowlist = try(var.secrets["allowed_ip_addresses"], [])
   allowed_cidrs = [
     for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"
@@ -41,12 +42,12 @@ locals {
       formatted_allowed_ip_addresses = local.formatted_allowed_ips
       ab_tests_rendered = templatefile(
         "${path.module}/_multivariate_tests.vcl.tftpl",
-        { ab_tests = try(var.configuration["ab_tests"], []) }
+        { ab_tests = try(yamldecode(file("ab_tests.yaml")), []) }
       )
       module_path = path.module
     },
     var.configuration,
-    var.secrets
+    local.secrets
   )
 }
 

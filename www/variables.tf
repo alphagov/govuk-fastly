@@ -1,3 +1,7 @@
+variable "govuk_environment" {
+  type = string
+}
+
 variable "secrets" {
   default = {}
 }

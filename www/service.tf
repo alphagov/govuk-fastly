@@ -251,3 +251,4 @@ resource "fastly_service_dictionary_items" "items" {
   items         = var.dictionaries[each.key]
   manage_items  = true
 }
+

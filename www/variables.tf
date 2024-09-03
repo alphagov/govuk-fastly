@@ -20,6 +20,6 @@ variable "vcl_template_file" {
 }
 
 variable "TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA" {
-  type = string
+  type    = string
   default = "NO HASH"
 }

@@ -18,3 +18,8 @@ variable "vcl_template_file" {
   type    = string
   default = "www.vcl.tftpl"
 }
+
+variable "TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA" {
+  type = string
+  default = "NO HASH"
+}

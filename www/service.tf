@@ -1,6 +1,10 @@
 locals {
   secrets      = yamldecode(var.secrets)
-  ip_allowlist = try(var.secrets["allowed_ip_addresses"], [])
+  dictionaries = merge(
+    yamldecode(var.dictionaries),
+    yamldecode(file("../dictionaries.yaml"))
+  )
+  ip_allowlist = try(local.secrets["allowed_ip_addresses"], [])
   allowed_cidrs = [
     for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"
   ]
@@ -38,7 +42,6 @@ locals {
       private_extra_vcl_recv = ""
       ab_tests               = []
 
-      git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
       environment = var.environment
     },
     { # computed values
@@ -110,7 +113,7 @@ resource "fastly_service_vcl" "service" {
   }
 
   dynamic "dictionary" {
-    for_each = var.dictionaries
+    for_each = local.dictionaries
     content {
       name = dictionary.key
     }
@@ -136,7 +139,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_splunk" {
     for_each = {
-      for splunk in try(var.secrets["splunk"], []) : splunk.name => splunk
+      for splunk in try(local.secrets["splunk"], []) : splunk.name => splunk
     }
     iterator = each
     content {
@@ -164,7 +167,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_s3" {
     for_each = {
-      for s3 in try(var.secrets["s3"], []) : s3.name => s3
+      for s3 in try(local.secrets["s3"], []) : s3.name => s3
     }
     iterator = each
     content {
@@ -213,7 +216,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_bigquery" {
     for_each = {
-      for bigquery in try(var.secrets["bigquery"], []) : bigquery.name => bigquery
+      for bigquery in try(local.secrets["bigquery"], []) : bigquery.name => bigquery
     }
     iterator = each
     content {
@@ -252,7 +255,7 @@ resource "fastly_service_dictionary_items" "items" {
   }
   service_id    = fastly_service_vcl.service.id
   dictionary_id = each.value.dictionary_id
-  items         = var.dictionaries[each.key]
+  items         = local.dictionaries[each.key]
   manage_items  = true
 }
 

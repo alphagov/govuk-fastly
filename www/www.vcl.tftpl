@@ -20,7 +20,7 @@ backend F_origin {
         .request =
             "HEAD ${probe} HTTP/1.1"
             "Host: ${origin_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
+            "User-Agent: Fastly healthcheck"
             "Rate-Limit-Token: ${rate_limit_token}"
 %{ if basic_authentication != null ~}
             "Authorization: Basic ${basic_authentication}"
@@ -85,7 +85,7 @@ backend F_mirrorS3 {
         .request =
             "HEAD ${s3_mirror_probe} HTTP/1.1"
             "Host: ${s3_mirror_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
+            "User-Agent: Fastly healthcheck"
             "Connection: close";
         .threshold = 1;
         .window = 2;
@@ -118,7 +118,7 @@ backend F_mirrorS3Replica {
         .request =
             "HEAD ${s3_mirror_replica_probe} HTTP/1.1"
             "Host: ${s3_mirror_replica_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
+            "User-Agent: Fastly healthcheck"
             "Connection: close";
         .threshold = 1;
         .window = 2;
@@ -151,7 +151,7 @@ backend F_mirrorGCS {
         .request =
             "HEAD ${gcs_mirror_probe} HTTP/1.1"
             "Host: ${gcs_mirror_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
+            "User-Agent: Fastly healthcheck"
             "Connection: close";
         .threshold = 1;
         .window = 2;

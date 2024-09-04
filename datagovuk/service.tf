@@ -1,5 +1,5 @@
 locals {
-  secrets = yamldecode(var.secrets)
+  secrets      = yamldecode(var.secrets)
   dictionaries = yamldecode(var.dictionaries)
 
   ip_allowlist = try(local.secrets["allowed_ip_addresses"], [])

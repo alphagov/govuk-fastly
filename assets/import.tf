@@ -17,6 +17,6 @@ import {
 
 import {
   for_each = local.dictionaries
-  to = fastly_service_dictionary_items.items[each.key]
-  id = "${local.fastly_service_id}/${one([for d in data.fastly_dictionaries.dicts.dictionaries : d if d.name == each.key]).id}"
+  to       = fastly_service_dictionary_items.items[each.key]
+  id       = "${local.fastly_service_id}/${one([for d in data.fastly_dictionaries.dicts.dictionaries : d if d.name == each.key]).id}"
 }

@@ -1,10 +1,10 @@
 locals {
-  secrets      = yamldecode(var.secrets)
+  secrets = yamldecode(var.secrets)
   dictionaries = merge(
     yamldecode(var.dictionaries),
     yamldecode(file("../dictionaries.yaml"))
   )
-  ab_tests = try(yamldecode(file("./ab_tests.yaml")), [])
+  ab_tests     = try(yamldecode(file("./ab_tests.yaml")), [])
   ip_allowlist = try(local.secrets["allowed_ip_addresses"], [])
   allowed_cidrs = [
     for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"

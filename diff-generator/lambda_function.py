@@ -8,8 +8,8 @@ from boto3 import client
 
 def find_vcls(plan):
   vcls = {}
-  before = plan['prior_state']['values']['root_module']['child_modules']
-  after = plan['planned_values']['root_module']['child_modules']
+  before = plan['prior_state']['values']['root_module']
+  after = plan['planned_values']['root_module']
 
   for module in before:
     for resource in module['resources']:

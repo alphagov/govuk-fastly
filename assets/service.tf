@@ -1,4 +1,10 @@
 locals {
+  secrets = yamldecode(var.secrets)
+  dictionaries = merge(
+    yamldecode(var.dictionaries),
+    yamldecode(file("../dictionaries.yaml"))
+  )
+
   template_values = merge(
     { # some defaults
       aws_origin_port      = 443
@@ -23,12 +29,14 @@ locals {
       gcs_mirror_prefix          = null
       gcs_mirror_probe           = null
       gcs_mirror_port            = 443
+
+      environment = var.environment
     },
     { # computed values
       module_path = path.module
     },
     var.configuration,
-    var.secrets
+    local.secrets
   )
 }
 
@@ -88,7 +96,7 @@ resource "fastly_service_vcl" "service" {
   }
 
   dynamic "dictionary" {
-    for_each = var.dictionaries
+    for_each = local.dictionaries
     content {
       name = dictionary.key
     }
@@ -114,7 +122,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_splunk" {
     for_each = {
-      for splunk in lookup(var.secrets, "splunk", []) : splunk.name => splunk
+      for splunk in lookup(local.secrets, "splunk", []) : splunk.name => splunk
     }
     iterator = each
     content {
@@ -142,7 +150,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_s3" {
     for_each = {
-      for s3 in lookup(var.secrets, "s3", []) : s3.name => s3
+      for s3 in lookup(local.secrets, "s3", []) : s3.name => s3
     }
     iterator = each
     content {
@@ -196,6 +204,6 @@ resource "fastly_service_dictionary_items" "items" {
   }
   service_id    = fastly_service_vcl.service.id
   dictionary_id = each.value.dictionary_id
-  items         = var.dictionaries[each.key]
+  items         = local.dictionaries[each.key]
   manage_items  = true
 }

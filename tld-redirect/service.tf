@@ -1,5 +1,5 @@
 resource "fastly_service_vcl" "service" {
-  name    = "Production TLD Redirect"
+  name    = "${title(var.environment)} TLD Redirect"
   comment = ""
 
   domain {

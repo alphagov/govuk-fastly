@@ -20,7 +20,7 @@ backend F_cname_find_eks_${environment}_govuk_digital {
         .request =
             "HEAD ${probe} HTTP/1.1"
             "Host: ${origin_hostname}"
-            "User-Agent: Fastly healthcheck (Git commit: ${git_hash})"
+            "User-Agent: Fastly healthcheck"
             "Rate-Limit-Token: ${rate_limit_token}"
 %{ if basic_authentication != null ~}
             "Authorization: Basic ${basic_authentication}"

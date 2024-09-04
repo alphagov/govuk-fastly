@@ -1,5 +1,8 @@
 locals {
-  ip_allowlist = try(var.secrets["allowed_ip_addresses"], [])
+  secrets = yamldecode(var.secrets)
+  dictionaries = yamldecode(var.dictionaries)
+
+  ip_allowlist = try(local.secrets["allowed_ip_addresses"], [])
   allowed_cidrs = [
     for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"
   ]
@@ -32,13 +35,15 @@ locals {
       gcs_mirror_port            = 443
 
       private_extra_vcl_recv = ""
+
+      environment = var.environment
     },
     { # computed values
       formatted_allowed_ip_addresses = local.formatted_allowed_ips
       module_path                    = path.module
     },
     var.configuration,
-    var.secrets
+    local.secrets
   )
 }
 
@@ -61,7 +66,7 @@ resource "fastly_service_vcl" "service" {
   }
 
   dynamic "dictionary" {
-    for_each = var.dictionaries
+    for_each = local.dictionaries
     content { name = dictionary.key }
   }
 
@@ -131,7 +136,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_splunk" {
     for_each = {
-      for splunk in lookup(var.secrets, "splunk", []) : splunk.name => splunk
+      for splunk in lookup(local.secrets, "splunk", []) : splunk.name => splunk
     }
     iterator = each
     content {
@@ -159,7 +164,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_s3" {
     for_each = {
-      for s3 in lookup(var.secrets, "s3", []) : s3.name => s3
+      for s3 in lookup(local.secrets, "s3", []) : s3.name => s3
     }
     iterator = each
     content {
@@ -193,6 +198,6 @@ resource "fastly_service_dictionary_items" "items" {
   }
   service_id    = fastly_service_vcl.service.id
   dictionary_id = each.value.dictionary_id
-  items         = var.dictionaries[each.key]
+  items         = local.dictionaries[each.key]
   manage_items  = true
 }

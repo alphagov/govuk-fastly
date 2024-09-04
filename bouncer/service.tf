@@ -3,6 +3,8 @@ data "http" "domains" {
 }
 
 locals {
+  secrets = yamldecode(var.secrets)
+
   domains_json = jsondecode(data.http.domains.response_body)
   domains = {
     for d in local.domains_json.results :
@@ -52,7 +54,7 @@ resource "fastly_service_vcl" "service" {
 
   dynamic "logging_s3" {
     for_each = {
-      for s3 in lookup(var.secrets, "s3", []) : s3.name => s3
+      for s3 in lookup(local.secrets, "s3", []) : s3.name => s3
     }
     iterator = each
     content {

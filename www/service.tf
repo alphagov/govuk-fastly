@@ -4,6 +4,7 @@ locals {
     yamldecode(var.dictionaries),
     yamldecode(file("../dictionaries.yaml"))
   )
+  ab_tests = try(yamldecode(file("./ab_tests.yaml")), [])
   ip_allowlist = try(local.secrets["allowed_ip_addresses"], [])
   allowed_cidrs = [
     for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"
@@ -40,7 +41,7 @@ locals {
       gcs_mirror_port            = 443
 
       private_extra_vcl_recv = ""
-      ab_tests               = []
+      ab_tests               = local.ab_tests
 
       environment = var.environment
     },
@@ -48,7 +49,7 @@ locals {
       formatted_allowed_ip_addresses = local.formatted_allowed_ips
       ab_tests_rendered = templatefile(
         "${path.module}/_multivariate_tests.vcl.tftpl",
-        { ab_tests = try(yamldecode(file("ab_tests.yaml")), []) }
+        { ab_tests = local.ab_tests }
       )
       module_path = path.module
     },

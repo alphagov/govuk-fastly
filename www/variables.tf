@@ -1,4 +1,4 @@
-variable "govuk_environment" {
+variable "environment" {
   type = string
 }
 

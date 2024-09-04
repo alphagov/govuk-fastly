@@ -1,7 +1,7 @@
 data "fastly_services" "services" {}
 
 locals {
-  fastly_service    = one([for service in data.fastly_services.services : service if service.name == "${title(var.govuk_environment)} GOV.UK"])
+  fastly_service    = one([for service in data.fastly_services.services : service if service.name == "${title(var.environment)} GOV.UK"])
   fastly_service_id = fastly_service.id
 }
 

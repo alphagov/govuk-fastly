@@ -39,6 +39,7 @@ locals {
       ab_tests               = []
 
       git_hash = var.TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA
+      environment = var.environment
     },
     { # computed values
       formatted_allowed_ip_addresses = local.formatted_allowed_ips

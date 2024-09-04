@@ -13,7 +13,7 @@ locals {
 }
 
 resource "fastly_service_vcl" "mobile_backend_service" {
-  name  = "Mobile backend - ${title(var.environment)}"
+  name  = "GOV.UK App mobile backend - ${title(var.environment)}"
   http3 = true
 
   domain {

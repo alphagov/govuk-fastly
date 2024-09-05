@@ -505,7 +505,7 @@ sub vcl_fetch {
   }
 
   # We don't want to cache any /chat/* responses that set a cookie
-  if (req.url ~ "^/chat/" && resp.http.Set-Cookie) {
+  if (req.url ~ "^/chat/" && beresp.http.Set-Cookie) {
     return (pass);
   }
 

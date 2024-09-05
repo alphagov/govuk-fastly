@@ -11,21 +11,19 @@ def find_vcls(plan):
   before = plan['prior_state']['values']['root_module']
   after = plan['planned_values']['root_module']
 
-  for module in before:
-    for resource in module['resources']:
-      if resource['type'] == "fastly_service_vcl":
-        address = resource['address']
+  for resource in before['resources']:
+    if resource['type'] == "fastly_service_vcl":
+      address = resource['address']
+      vcl = resource['values']['vcl'][0]['content']
+      vcls[address] = {
+        "before": vcl
+      }
+  for resource in after['resources']:
+    if resource['type'] == "fastly_service_vcl":
+      address = resource['address']
+      if address in vcls:
         vcl = resource['values']['vcl'][0]['content']
-        vcls[address] = {
-          "before": vcl
-        }
-  for module in after:
-    for resource in module['resources']:
-      if resource['type'] == "fastly_service_vcl":
-        address = resource['address']
-        if address in vcls:
-          vcl = resource['values']['vcl'][0]['content']
-          vcls[address]['after'] = vcl
+        vcls[address]['after'] = vcl
   return vcls
 
 def generate_unified_diff(vcls):

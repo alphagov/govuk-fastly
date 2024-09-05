@@ -1,4 +1,8 @@
 locals {
+  secrets         = yamldecode(var.secrets)
+  hostname        = local.secrets["hostname"]
+  origin_hostname = local.secrets["origin_hostname"]
+
   strip_headers = [
     "x-amz-id-2",
     "x-amz-meta-server-side-encryption",
@@ -17,12 +21,12 @@ resource "fastly_service_vcl" "mobile_backend_service" {
   http3 = true
 
   domain {
-    name = var.hostname
+    name = local.hostname
   }
 
   backend {
     name    = "Mobile backend config bucket - ${var.environment}"
-    address = var.origin_hostname
+    address = local.origin_hostname
     port    = 443
 
     connect_timeout       = 1000
@@ -32,8 +36,8 @@ resource "fastly_service_vcl" "mobile_backend_service" {
 
     ssl_check_cert    = true
     ssl_ciphers       = "ECDHE-RSA-AES256-GCM-SHA384"
-    ssl_cert_hostname = var.origin_hostname
-    ssl_sni_hostname  = var.origin_hostname
+    ssl_cert_hostname = local.origin_hostname
+    ssl_sni_hostname  = local.origin_hostname
     min_tls_version   = "1.2"
   }
 

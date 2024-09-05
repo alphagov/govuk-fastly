@@ -377,7 +377,7 @@ sub vcl_recv {
   # otherwise pass through
   if (req.url ~ "^/chat/") {
     if (req.http.cookie:_govuk_chat_session) {
-      return(pass)
+      return(pass);
     } else {
       unset req.http.Cookie;
     }

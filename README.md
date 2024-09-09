@@ -16,17 +16,17 @@ The VCL templates in this repository depend on secrets set in [govuk-fastly-secr
 
 1. Ensure you have terraform installed (tfenv is preferable)
 1. Log in to your Terraform Cloud account with `terraform login`
-1. Run `terraform init` to initialise the providers and modules
+1. `cd` to the service module in which you wish to make changes
+1. Run `terraform init` and pick an environment to run the plan in
 1. Run `terraform plan` to run plans with your local copy of the config
 
-## Directory Structure
+## File Structure
 
-* `modules/` - contains reusable modules
-* `modules/www` - configuration for www.gov.uk service
-* `modules/assets` - configuration for assets service
-* `modules/shared` - contains files that are required by multiple services
-* `ab_tests.yaml` - list of AB test variants
+* `shared/` - contains common files that are used by multiple services
+* `www/ab_tests.yaml` - list of AB test variants
 * `dictionaries.yaml` - non-secret Fastly dictionaries (e.g. AB test expiry times)
+
+Each other directory in the root of this repo is a Fastly service.
 
 ## Getting Terraform Cloud access
 
@@ -35,4 +35,4 @@ Terraform Cloud uses Google SSO for login. To create your account, go to the [SS
 ## Caveats
 
 * If you update secrets in the [govuk-fastly-secrets](https://github.com/alphagov/govuk-fastly-secrets) repository, you may need to also run an apply on this repository after for your changes to take effect
-* Currently, all environments use the same configuration. If you need to make changes to only one environment, consider either adding an if block to the VCL template or [temporarily using a different VCL template](https://github.com/alphagov/govuk-fastly/blob/04767ad5c256c39d9ffe5361b8d57c52e193700c/modules/www/variables.tf#L13).
+* All environments for a given service share a common VCL template. If you need to make changes to the VCL, you may want to wrap your changes in an `if` statement, or specify `vcl_template_file` in `govuk-fastly-secrets` to temporarily use a different template file for a given environment.

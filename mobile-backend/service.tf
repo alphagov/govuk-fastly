@@ -11,8 +11,7 @@ locals {
     "x-amz-server-side-encryption"
   ]
   # headers to add
-  ttl                         = "300s" # 5 minutes
-  cache_control               = "max-age=300, public, immutable"
+  cache_control               = "max-age=300, public, immutable" # 5 minutes
   access_control_allow_origin = "*"
 }
 
@@ -25,15 +24,17 @@ resource "fastly_service_vcl" "mobile_backend_service" {
   }
 
   backend {
-    name    = "Mobile backend config bucket - ${var.environment}"
-    address = local.origin_hostname
-    port    = 443
+    name          = "Mobile backend config bucket - ${var.environment}"
+    address       = local.origin_hostname
+    override_host = local.origin_hostname
+    port          = 443
 
     connect_timeout       = 1000
     first_byte_timeout    = 15000
     max_conn              = 200
     between_bytes_timeout = 10000
 
+    use_ssl           = true
     ssl_check_cert    = true
     ssl_ciphers       = "ECDHE-RSA-AES256-GCM-SHA384"
     ssl_cert_hostname = local.origin_hostname
@@ -49,14 +50,6 @@ resource "fastly_service_vcl" "mobile_backend_service" {
       action      = "delete"
       type        = "cache"
     }
-  }
-
-  header {
-    destination = "ttl"
-    name        = "Add ttl header"
-    action      = "set"
-    type        = "response"
-    source      = "\"${local.ttl}\""
   }
 
   header {

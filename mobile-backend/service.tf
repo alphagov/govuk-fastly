@@ -56,7 +56,7 @@ resource "fastly_service_vcl" "mobile_backend_service" {
     name        = "Add ttl header"
     action      = "set"
     type        = "response"
-    source      = local.ttl
+    source      = "\"${local.ttl}\""
   }
 
   header {
@@ -64,7 +64,7 @@ resource "fastly_service_vcl" "mobile_backend_service" {
     name        = "Add Cache-Control header"
     action      = "set"
     type        = "response"
-    source      = local.cache_control
+    source      = "\"${local.cache_control}\""
   }
 
   header {
@@ -72,7 +72,7 @@ resource "fastly_service_vcl" "mobile_backend_service" {
     name        = "Add Access-Control-Allow-Origin header"
     action      = "set"
     type        = "response"
-    source      = local.access_control_allow_origin
+    source      = "\"${local.access_control_allow_origin}\""
   }
 
 }

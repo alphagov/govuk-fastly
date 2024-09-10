@@ -36,6 +36,14 @@ backend F_cname_find_eks_${environment}_govuk_digital {
 %{ endif ~}
 }
 
+%{ if environment != "production" ~}
+acl allowed_ip_addresses {
+  %{ for ip in formatted_allowed_ip_addresses ~}
+  ${ip};
+  %{ endfor ~}
+}
+%{ endif ~}
+
 sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 

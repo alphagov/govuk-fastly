@@ -47,6 +47,14 @@ acl allowed_ip_addresses {
 sub vcl_recv {
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
+  %{ if environment != "production" ~}
+  # Only allow connections from allowed IP addresses in non production environments
+  if (! (req.http.True-Client-IP ~ allowed_ip_addresses)) {
+    error 403 "Forbidden";
+  }
+  %{ endif ~}
+
+
   if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
     set req.http.Client-JA3 = tls.client.ja3_md5;
 

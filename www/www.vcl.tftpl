@@ -373,6 +373,13 @@ sub vcl_recv {
     unset req.http.Cookie;
   }
 
+%{ if disable_chat == true ~}
+  # Chat app is disabled
+  if (req.url ~ "^/chat/") {
+    error 503 "Service unavailable";
+  }
+%{ endif ~}
+
   # Strip cookies for requests to /chat/* that lack a session cookie,
   # otherwise pass through
   if (req.url ~ "^/chat/") {

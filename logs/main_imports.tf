@@ -1,56 +1,56 @@
 import {
   to = aws_s3_bucket.fastly_logs
-  id = "govuk-staging-fastly-logs"
+  id = "govuk-integration-fastly-logs"
 }
 
 import {
   to = aws_s3_bucket_logging.fastly_logs
-  id = "govuk-staging-fastly-logs"
+  id = "govuk-integration-fastly-logs"
 }
 
 import {
   to = aws_s3_bucket_lifecycle_configuration.fastly_logs
-  id = "govuk-staging-fastly-logs"
+  id = "govuk-integration-fastly-logs"
 }
 
 import {
   to = aws_s3_bucket.fastly_logs_monitoring
-  id = "govuk-staging-fastly-logs-monitoring"
+  id = "govuk-integration-fastly-logs-monitoring"
 }
 
 import {
   to = aws_s3_bucket_logging.fastly_logs_monitoring
-  id = "govuk-staging-fastly-logs-monitoring"
+  id = "govuk-integration-fastly-logs-monitoring"
 }
 
 import {
   to = aws_s3_bucket_lifecycle_configuration.fastly_logs_monitoring
-  id = "govuk-staging-fastly-logs-monitoring"
+  id = "govuk-integration-fastly-logs-monitoring"
 }
 
 import {
   to = aws_s3_bucket.transition_fastly_logs
-  id = "govuk-staging-transition-fastly-logs"
+  id = "govuk-integration-transition-fastly-logs"
 }
 
 import {
   to = aws_s3_bucket_logging.transition_fastly_logs
-  id = "govuk-staging-transition-fastly-logs"
+  id = "govuk-integration-transition-fastly-logs"
 }
 
 import {
   to = aws_s3_bucket_lifecycle_configuration.transition_fastly_logs
-  id = "govuk-staging-transition-fastly-logs"
+  id = "govuk-integration-transition-fastly-logs"
 }
 
 import {
   to = aws_iam_user.logs_writer
-  id = "govuk-staging-fastly-logs-writer"
+  id = "govuk-integration-fastly-logs-writer"
 }
 
 import {
   to = aws_iam_policy.logs_writer
-  id = "arn:aws:iam::172025368201:policy/fastly-logs-staging-logs-writer-policy"
+  id = "arn:aws:iam::172025368201:policy/fastly-logs-integration-logs-writer-policy"
 }
 
 import {
@@ -70,7 +70,7 @@ import {
 
 import {
   to = aws_iam_role_policy.fastly_logs_policy
-  id = "AWSGlueServiceRole-fastly-logs:govuk-staging-fastly-logs-glue-policy"
+  id = "AWSGlueServiceRole-fastly-logs:govuk-integration-fastly-logs-glue-policy"
 }
 
 import {
@@ -105,12 +105,12 @@ import {
 
 import {
   to = aws_iam_user.transition_downloader
-  id = "govuk-staging-transition-downloader"
+  id = "govuk-integration-transition-downloader"
 }
 
 import {
   to = aws_iam_policy.transition_downloader
-  id = "arn:aws:iam::172025368201:policy/fastly-logs-staging-transition-downloader-policy"
+  id = "arn:aws:iam::172025368201:policy/fastly-logs-integration-transition-downloader-policy"
 }
 
 import {
@@ -120,22 +120,22 @@ import {
 
 import {
   to = aws_iam_policy.transition_executor
-  id = "arn:aws:iam::172025368201:policy/fastly-logs-staging-transition-executor-policy"
+  id = "arn:aws:iam::172025368201:policy/fastly-logs-integration-transition-executor-policy"
 }
 
 import {
   to = aws_iam_role_policy_attachment.transition_executor
-  id = "AWSLambdaRole-transition-executor/arn:aws:iam::172025368201:policy/fastly-logs-staging-transition-executor-policy"
+  id = "AWSLambdaRole-transition-executor/arn:aws:iam::172025368201:policy/fastly-logs-integration-transition-executor-policy"
 }
 
 import {
   to = aws_athena_named_query.transition_logs
-  id = "511d805e-7013-4305-b592-41f0bd370b9c"
+  id = "0ee11316-262c-4dea-8bfe-135a9374b5fc"
 }
 
 import {
   to = aws_lambda_function.transition_executor
-  id = "govuk-staging-transition"
+  id = "govuk-integration-transition"
 }
 
 import {
@@ -145,10 +145,10 @@ import {
 
 import {
   to = aws_cloudwatch_event_target.transition_executor_daily
-  id = "transition_executor_daily/terraform-20190426115748465800000002"
+  id = "transition_executor_daily/terraform-20190426121530164600000002"
 }
 
 import {
   to = aws_lambda_permission.cloudwatch_transition_executor_daily_permission
-  id = "govuk-staging-transition/AllowExecutionFromCloudWatch"
+  id = "govuk-integration-transition/AllowExecutionFromCloudWatch"
 }

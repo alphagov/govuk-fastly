@@ -43,7 +43,7 @@ sub vcl_error {
   if (obj.status == 802) {
     set obj.status = 301;
     set obj.response = "Moved Permanently";
-    set obj.http.Location = "https://www.gov.uk" req.url;
+    set obj.http.Location = "https://www.${domain}" req.url;
     set obj.http.Strict-Transport-Security = "max-age=63072000; preload";
   }
 

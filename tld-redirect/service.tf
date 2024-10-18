@@ -3,12 +3,12 @@ resource "fastly_service_vcl" "service" {
   comment = ""
 
   domain {
-    name = "gov.uk"
+    name = var.domain
   }
 
   vcl {
     main    = true
     name    = "main"
-    content = file("${path.module}/tldredirect.vcl")
+    content = templatefile("${path.module}/tldredirect.vcl.tftpl", { domain = var.domain })
   }
 }

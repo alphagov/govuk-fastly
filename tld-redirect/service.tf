@@ -1,14 +1,18 @@
+locals {
+  secrets = yamldecode(var.secrets)
+}
+
 resource "fastly_service_vcl" "service" {
   name    = "${title(var.environment)} TLD Redirect"
   comment = ""
 
   domain {
-    name = "gov.uk"
+    name = local.secrets["domain"]
   }
 
   vcl {
     main    = true
     name    = "main"
-    content = file("${path.module}/tldredirect.vcl")
+    content = templatefile("${path.module}/tldredirect.vcl.tftpl", local.secrets)
   }
 }

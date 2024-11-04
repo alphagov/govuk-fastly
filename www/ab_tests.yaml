@@ -12,3 +12,7 @@
   - B
   - C
   - Z
+- SearchAutocomplete:
+  - A # Autocomplete off (control)
+  - B # Autocomplete on (experiment)
+  - Z # Baseline

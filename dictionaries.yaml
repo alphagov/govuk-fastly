@@ -2,10 +2,12 @@ active_ab_tests:
   Example: true
   BankHolidaysTest: true
   PopularTasks: true
+  SearchAutocomplete: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
   PopularTasks: 7862400 # 91 days/ 3 months avg
+  SearchAutocomplete: 86400
 # AB test percentages
 example_percentages:
   A: 50
@@ -18,3 +20,7 @@ populartasks_percentages:
   B: 33
   C: 33
   Z: 1
+searchautocomplete_percentages:
+  A: 0 # Autocomplete off (control)
+  B: 0 # Autocomplete on (experiment)
+  Z: 100 # Baseline

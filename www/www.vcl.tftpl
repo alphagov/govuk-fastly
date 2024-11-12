@@ -385,6 +385,10 @@ sub vcl_recv {
   if (req.url ~ "^/chat/") {
     if (req.http.cookie:_govuk_chat_session) {
       return(pass);
+    # These endpoints make use of HEAD requests and we don't want these
+    # to be converted to GET requests (https://www.fastly.com/documentation/reference/vcl/subroutines/recv/)
+    } elsif (req.url ~ "^/chat/(sign-in|unsubscribe)" && req.request == "HEAD") {
+      return(pass);
     } else {
       unset req.http.Cookie;
     }

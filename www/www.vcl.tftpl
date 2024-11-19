@@ -230,7 +230,7 @@ sub vcl_recv {
   if (req.method !~ "^(GET|HEAD|POST|PUT|DELETE|OPTIONS|PATCH|FASTLYPURGE)") {
     error 806 "Not Implemented";
   }
-  
+
   %{ if private_extra_vcl_recv != "" ~}
     ${private_extra_vcl_recv}
   %{ endif ~}
@@ -369,7 +369,7 @@ sub vcl_recv {
   #   - Licensing
   #   - email-alert-frontend (for subscription management)
   #   - sign-in (digital identity) callback
-  if (req.url !~ "^/(apply-for-a-licence|email|sign-in/callback|chat/)") {
+  if (req.url !~ "^/(apply-for-a-licence|email|sign-in/callback/)") {
     unset req.http.Cookie;
   }
 
@@ -380,9 +380,9 @@ sub vcl_recv {
   }
 %{ endif ~}
 
-  # Strip cookies for requests to /chat/* that lack a session cookie,
+  # Strip cookies for requests to /chat or /chat/* that lack a session cookie,
   # otherwise pass through
-  if (req.url ~ "^/chat/") {
+  if (req.url.path ~ "^/chat(/.*)?$") {
     if (req.http.cookie:_govuk_chat_session) {
       return(pass);
     # These endpoints make use of HEAD requests and we don't want these
@@ -511,7 +511,7 @@ sub vcl_fetch {
   }
 
   # Strip cookies from outbound requests. Corresponding rule in vcl_recv{}
-  if (req.url !~ "^/(apply-for-a-licence|email|sign-in/callback|chat/)") {
+  if (req.url !~ "^/(apply-for-a-licence|email|sign-in/callback/)") {
     unset beresp.http.Set-Cookie;
   }
 

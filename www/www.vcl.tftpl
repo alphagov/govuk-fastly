@@ -375,7 +375,7 @@ sub vcl_recv {
 
 %{ if disable_chat == true ~}
   # Chat app is disabled
-  if (req.url ~ "^/chat/") {
+  if (req.url.path ~ "^/chat(/.*)?$") {
     error 503 "Service unavailable";
   }
 %{ endif ~}

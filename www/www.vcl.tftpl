@@ -515,8 +515,8 @@ sub vcl_fetch {
     unset beresp.http.Set-Cookie;
   }
 
-  # We don't want to cache any /chat/* responses that set a cookie
-  if (req.url ~ "^/chat/" && beresp.http.Set-Cookie) {
+  # We don't want to cache any /chat or /chat/* responses that set a cookie
+  if (req.url.path ~ "^/chat(/.*)?$" && beresp.http.Set-Cookie) {
     return (pass);
   }
 

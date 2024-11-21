@@ -363,9 +363,9 @@ sub vcl_recv {
 
   ${indent(2, ab_tests_rendered)}
 
-  # Strip cookies for requests to /chat or /chat/* that lack a session cookie,
+  # Strip cookies for requests to GOV.UK Chat URLs that lack a session cookie,
   # otherwise pass through
-  if (req.url.path ~ "^/chat(/.*)?$") {
+  if (req.url.path ~ "${chat_path_regex}") {
     if (req.http.cookie:_govuk_chat_session) {
       return(pass);
     # These endpoints make use of HEAD requests and we don't want these
@@ -389,7 +389,7 @@ sub vcl_recv {
 
 %{ if disable_chat == true ~}
   # Chat app is disabled
-  if (req.url.path ~ "^/chat(/.*)?$") {
+  if (req.url.path ~ "${chat_path_regex}") {
     error 503 "Service unavailable";
   }
 %{ endif ~}
@@ -510,8 +510,8 @@ sub vcl_fetch {
     }
   }
 
-  # We don't want to cache any /chat or /chat/* responses that set a cookie
-  if (req.url.path ~ "^/chat(/.*)?$" && beresp.http.Set-Cookie) {
+  # We don't want to cache any GOV.UK Chat responses that set a cookie
+  if (req.url.path ~ "${chat_path_regex}" && beresp.http.Set-Cookie) {
     return (pass);
   }
 

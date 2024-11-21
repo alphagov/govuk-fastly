@@ -8,6 +8,6 @@
   - A
   - B
 - SearchAutocomplete:
-  - A # Autocomplete off (control)
-  - B # Autocomplete on (experiment)
-  - Z # Baseline
+  - A # Autocomplete off
+  - B # Autocomplete on
+  - Z # Autocomplete off (control)

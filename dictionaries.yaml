@@ -14,6 +14,6 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 searchautocomplete_percentages:
-  A: 5 # Autocomplete off
-  B: 5 # Autocomplete on
-  Z: 90 # Autocomplete off (control)
+  A: 50 # Autocomplete off
+  B: 50 # Autocomplete on
+  Z: 0 # Autocomplete off (control)

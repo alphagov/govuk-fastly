@@ -1,11 +1,9 @@
 active_ab_tests:
   Example: true
   BankHolidaysTest: true
-  SearchAutocomplete: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  SearchAutocomplete: 7776000 # 90 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -13,7 +11,3 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
-searchautocomplete_percentages:
-  A: 50 # Autocomplete off
-  B: 50 # Autocomplete on
-  Z: 0 # Autocomplete off (control)

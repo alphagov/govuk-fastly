@@ -7,7 +7,3 @@
 - BankHolidaysTest:
   - A
   - B
-- SearchAutocomplete:
-  - A # Autocomplete off
-  - B # Autocomplete on
-  - Z # Autocomplete off (control)

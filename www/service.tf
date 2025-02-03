@@ -149,7 +149,7 @@ resource "fastly_service_vcl" "service" {
 
     uri_dictionary_name = "bankholidaysjson_ratelimiter"
 
-    client_key   = "req.http.Fastly-Client-IP"
+    client_key   = "client.ip"
     http_methods = "GET,PUT,TRACE,POST,HEAD,DELETE,PATCH,OPTIONS"
 
     action = "response"

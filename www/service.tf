@@ -140,6 +140,27 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
+  rate_limiter {
+    name = "rate_limiter_bank_holidays_json"
+
+    rps_limit            = 5
+    window_size          = 10
+    penalty_box_duration = 1
+
+    uri_dictionary_name = "bankholidaysjson_ratelimiter"
+
+    client_key   = "req.http.Fastly-Client-IP"
+    http_methods = "GET,PUT,TRACE,POST,HEAD,DELETE,PATCH,OPTIONS"
+
+    action = "response"
+
+    response {
+      content      = "Too many requests"
+      content_type = "plain/text"
+      status       = 429
+    }
+  }
+
   dynamic "logging_splunk" {
     for_each = {
       for splunk in try(local.secrets["splunk"], []) : splunk.name => splunk

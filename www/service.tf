@@ -143,7 +143,7 @@ resource "fastly_service_vcl" "service" {
   rate_limiter {
     name = "rate_limiter_bank_holidays_json"
 
-    rps_limit            = 5
+    rps_limit            = 10
     window_size          = 10
     penalty_box_duration = 1
 

@@ -19,8 +19,6 @@ locals {
       minimum_tls_version  = "1.2"
       ssl_ciphers          = "ECDHE-RSA-AES256-GCM-SHA384"
       basic_authentication = null
-      disable_chat         = false
-      chat_path_regex      = "^/chat(/.*)?$" # matches /chat and /chat/*
 
       s3_static_assets_port     = 443
       s3_static_assets_hostname = null

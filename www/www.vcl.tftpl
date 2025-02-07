@@ -363,20 +363,6 @@ sub vcl_recv {
 
   ${indent(2, ab_tests_rendered)}
 
-  # Strip cookies for requests to GOV.UK Chat URLs that lack a session cookie,
-  # otherwise pass through
-  if (req.url.path ~ "${chat_path_regex}") {
-    if (req.http.cookie:_govuk_chat_session) {
-      return(pass);
-    # These endpoints make use of HEAD requests and we don't want these
-    # to be converted to GET requests (https://www.fastly.com/documentation/reference/vcl/subroutines/recv/)
-    } elsif (req.url ~ "^/chat/(sign-in|unsubscribe)" && req.request == "HEAD") {
-      return(pass);
-    } else {
-      unset req.http.Cookie;
-    }
-  }
-
   # Strip cookies from inbound requests. Corresponding rule in vcl_fetch{}
   # For simplicity and security most applications should not use cookies.
   # With the exception of:
@@ -386,13 +372,6 @@ sub vcl_recv {
   if (req.url !~ "^/(apply-for-a-licence|email|sign-in/callback/)") {
     unset req.http.Cookie;
   }
-
-%{ if disable_chat == true ~}
-  # Chat app is disabled
-  if (req.url.path ~ "${chat_path_regex}") {
-    error 503 "Service unavailable";
-  }
-%{ endif ~}
 
   if (req.url.path ~ "^\/assets(\/.*)?\z") {
     set req.backend = F_staticAssetsS3;
@@ -508,11 +487,6 @@ sub vcl_fetch {
       unset beresp.http.x-amz-version-id;
       unset beresp.http.x-amz-server-side-encryption;
     }
-  }
-
-  # We don't want to cache any GOV.UK Chat responses that set a cookie
-  if (req.url.path ~ "${chat_path_regex}" && beresp.http.Set-Cookie) {
-    return (pass);
   }
 
   # Strip cookies from outbound requests. Corresponding rule in vcl_recv{}

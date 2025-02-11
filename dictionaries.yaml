@@ -14,9 +14,9 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 contentslist_percentages:
-  A: 0
-  B: 0
-  Z: 100
+  A: 10
+  B: 10
+  Z: 80
 # Dictionary for /bank-holidays.json rate limiter
 bankholidaysjson_ratelimiter:
   '/bank-holidays.json': 'Bank Holidays JSON'

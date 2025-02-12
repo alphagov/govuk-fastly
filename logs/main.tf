@@ -47,8 +47,8 @@ data "aws_iam_policy_document" "logs_writer_policy" {
       "s3:PutObject"
     ]
     resources = [
-      aws_s3_bucket.fastly_logs.id,
-      "${aws_s3_bucket.fastly_logs.id}/*"
+      aws_s3_bucket.fastly_logs.arn,
+      "${aws_s3_bucket.fastly_logs.arn}/*"
     ]
   }
 }

@@ -1,11 +1,9 @@
 active_ab_tests:
   Example: true
   BankHolidaysTest: true
-  ContentsList: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  ContentsList: 1209600 # 14 days
 # AB test percentages
 example_percentages:
   A: 50
@@ -13,10 +11,6 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
-contentslist_percentages:
-  A: 50
-  B: 50
-  Z: 0
 # Dictionary for /bank-holidays.json rate limiter
 bankholidaysjson_ratelimiter:
   '/bank-holidays.json': 'Bank Holidays JSON'

@@ -1,10 +1,16 @@
 active_ab_tests:
   Example: true
   BankHolidaysTest: true
+  GraphQLMinistersIndex: true
+  GraphQLNewsArticles: true
+  GraphQLRoles: true
   SearchFreshnessBoost: true
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
+  GraphQLMinistersIndex: 86400
+  GraphQLNewsArticles: 86400
+  GraphQLRoles: 86400
   SearchFreshnessBoost: 86400
 # AB test percentages
 example_percentages:
@@ -13,6 +19,18 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
+graphql_ministers_index_percentages:
+  A: 0
+  B: 0
+  Z: 100
+graphql_news_articles_percentages:
+  A: 0
+  B: 0
+  Z: 100
+graphql_roles_percentages:
+  A: 0
+  B: 0
+  Z: 100
 searchfreshnessboost_percentages:
   A: 50
   B: 50

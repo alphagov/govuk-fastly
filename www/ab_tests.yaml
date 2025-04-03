@@ -7,6 +7,18 @@
 - BankHolidaysTest:
   - A
   - B
+- GraphQLMinistersIndex:
+  - A
+  - B
+  - Z
+- GraphQLNewsArticles:
+  - A
+  - B
+  - Z
+- GraphQLRoles:
+  - A
+  - B
+  - Z
 - SearchFreshnessBoost:
   - A
   - B

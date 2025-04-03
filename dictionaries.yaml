@@ -19,15 +19,15 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
-graphql_ministers_index_percentages:
+graphqlministersindex_percentages:
   A: 0
   B: 0
   Z: 100
-graphql_news_articles_percentages:
+graphqlnewsarticles_percentages:
   A: 0
   B: 0
   Z: 100
-graphql_roles_percentages:
+graphqlroles_percentages:
   A: 0
   B: 0
   Z: 100

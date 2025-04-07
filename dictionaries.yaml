@@ -4,6 +4,7 @@ active_ab_tests:
   GraphQLMinistersIndex: true
   GraphQLNewsArticles: true
   GraphQLRoles: true
+  GraphQLWorldIndex: true
   SearchFreshnessBoost: true
 ab_test_expiries:
   Example: 86400
@@ -11,6 +12,7 @@ ab_test_expiries:
   GraphQLMinistersIndex: 86400
   GraphQLNewsArticles: 86400
   GraphQLRoles: 86400
+  GraphQLWorldIndex: 86400
   SearchFreshnessBoost: 86400
 # AB test percentages
 example_percentages:
@@ -28,6 +30,10 @@ graphqlnewsarticles_percentages:
   B: 0
   Z: 100
 graphqlroles_percentages:
+  A: 0
+  B: 0
+  Z: 100
+graphqlworldindex_percentages:
   A: 0
   B: 0
   Z: 100

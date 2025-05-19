@@ -142,6 +142,7 @@ acl purge_ip_allowlist {
   "18.203.77.149";  # EKS Integration NAT gateways
   "52.212.155.150";
   "18.202.190.16";
+  "3.9.56.99";
 %{ endif ~}
 %{ if environment == "staging" ~}
   "18.203.108.248";  # AWS Staging NAT gateways
@@ -150,6 +151,7 @@ acl purge_ip_allowlist {
   "108.128.15.82";   # EKS Staging NAT gateways
   "46.137.141.50";
   "18.200.65.72";
+  "3.9.56.99";
 %{ endif ~}
 %{ if environment == "production" ~}
   "18.202.136.43";   # AWS Production NAT gateways

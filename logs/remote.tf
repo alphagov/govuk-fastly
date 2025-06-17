@@ -1,6 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-data "tfe_outputs" "vpc" {
+data "tfe_outputs" "logging" {
   organization = "govuk"
-  workspace    = "vpc-${var.govuk_environment}"
+  workspace    = "logging-${var.govuk_environment}"
 }

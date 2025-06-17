@@ -830,7 +830,7 @@ resource "aws_lambda_function" "transition_executor" {
   function_name = "govuk-${var.govuk_environment}-transition"
   role          = aws_iam_role.transition_executor.arn
   handler       = "main.lambda_handler"
-  runtime       = "python3.8"
+  runtime       = "python3.13"
 
   environment {
     variables = {

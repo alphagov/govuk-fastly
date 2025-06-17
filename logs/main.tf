@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "fastly_logs" {
 resource "aws_s3_bucket_logging" "fastly_logs" {
   bucket = aws_s3_bucket.fastly_logs.id
 
-  target_bucket = data.tfe_outputs.vpc.nonsensitive_values.aws_logging_bucket_id
+  target_bucket = data.tfe_outputs.logging.nonsensitive_values.aws_logging_bucket_id
   target_prefix = "s3/govuk-${var.govuk_environment}-fastly-logs/"
 }
 
@@ -675,7 +675,7 @@ resource "aws_s3_bucket" "fastly_logs_monitoring" {
 resource "aws_s3_bucket_logging" "fastly_logs_monitoring" {
   bucket = aws_s3_bucket.fastly_logs_monitoring.id
 
-  target_bucket = data.tfe_outputs.vpc.nonsensitive_values.aws_logging_bucket_id
+  target_bucket = data.tfe_outputs.logging.nonsensitive_values.aws_logging_bucket_id
   target_prefix = "s3/govuk-${var.govuk_environment}-fastly-logs-monitoring/"
 }
 
@@ -764,7 +764,7 @@ resource "aws_s3_bucket" "transition_fastly_logs" {
 resource "aws_s3_bucket_logging" "transition_fastly_logs" {
   bucket = aws_s3_bucket.transition_fastly_logs.id
 
-  target_bucket = data.tfe_outputs.vpc.nonsensitive_values.aws_logging_bucket_id
+  target_bucket = data.tfe_outputs.logging.nonsensitive_values.aws_logging_bucket_id
   target_prefix = "s3/govuk-${var.govuk_environment}-transition-fastly-logs/"
 }
 

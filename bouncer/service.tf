@@ -64,8 +64,9 @@ resource "fastly_service_vcl" "service" {
       path               = each.value.path
       period             = each.value.period
       redundancy         = each.value.redundancy
-      s3_access_key      = each.value.access_key_id
-      s3_secret_key      = each.value.secret_access_key
+      s3_iam_role        = try(each.value.iam_role_arn, null)
+      s3_access_key      = try(each.value.access_key_id, null)
+      s3_secret_key      = try(each.value.secret_access_key, null)
       response_condition = lookup(each.value, "response_condition", null)
 
       format_version   = 2

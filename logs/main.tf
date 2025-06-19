@@ -23,47 +23,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "fastly_logs" {
   }
 }
 
-# We require a user for Fastly to write to S3 buckets
-resource "aws_iam_user" "logs_writer" {
-  name = "govuk-${var.govuk_environment}-fastly-logs-writer"
-}
-
-data "aws_iam_policy_document" "logs_writer_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketLocation"
-    ]
-    resources = ["arn:aws:s3:::*"]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:PutObject"
-    ]
-    resources = [
-      aws_s3_bucket.fastly_logs.arn,
-      "${aws_s3_bucket.fastly_logs.arn}/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "logs_writer" {
-  name        = "fastly-logs-${var.govuk_environment}-logs-writer-policy"
-  policy      = data.aws_iam_policy_document.logs_writer_policy.json
-  description = "Allows writing to to the fastly-logs bucket"
-}
-
-resource "aws_iam_user_policy_attachment" "logs_writer" {
-  user       = aws_iam_user.logs_writer.name
-  policy_arn = aws_iam_policy.logs_writer.arn
-}
-
 resource "aws_glue_catalog_database" "fastly_logs" {
   name        = "fastly_logs"
   description = "Used to browse the CDN log files that Fastly sends"

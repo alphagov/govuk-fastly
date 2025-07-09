@@ -25,6 +25,13 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
+  product_enablement {
+    ddos_protection {
+      enabled = true
+      mode    = "log"
+    }
+  }
+
   vcl {
     main = true
     name = "main"

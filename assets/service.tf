@@ -50,6 +50,13 @@ resource "fastly_service_vcl" "service" {
     name = local.template_values["hostname"]
   }
 
+  product_enablement {
+    ddos_protection {
+      enabled = true
+      mode    = "log"
+    }
+  }
+
   vcl {
     main    = true
     name    = "main"

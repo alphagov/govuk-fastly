@@ -23,6 +23,13 @@ resource "fastly_service_vcl" "mobile_backend_service" {
     name = local.hostname
   }
 
+  product_enablement {
+    ddos_protection {
+      enabled = true
+      mode    = "log"
+    }
+  }
+
   backend {
     name          = "Mobile backend config bucket - ${var.environment}"
     address       = local.origin_hostname

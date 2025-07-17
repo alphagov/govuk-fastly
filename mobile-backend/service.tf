@@ -26,7 +26,7 @@ resource "fastly_service_vcl" "mobile_backend_service" {
   product_enablement {
     ddos_protection {
       enabled = true
-      mode    = "log"
+      mode    = "block"
     }
   }
 

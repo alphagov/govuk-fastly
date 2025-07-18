@@ -11,6 +11,9 @@ resource "fastly_service_vcl" "service" {
       enabled = true
       mode    = "block"
     }
+    domain_inspector      = true
+    log_explorer_insights = true
+    origin_inspector      = true
   }
 
   vcl {

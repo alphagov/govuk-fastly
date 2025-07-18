@@ -28,6 +28,9 @@ resource "fastly_service_vcl" "mobile_backend_service" {
       enabled = true
       mode    = "log"
     }
+    domain_inspector      = true
+    log_explorer_insights = true
+    origin_inspector      = true
   }
 
   backend {

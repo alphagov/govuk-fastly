@@ -263,6 +263,12 @@ sub vcl_recv {
     # get rid of all query parameters
     set req.url = querystring.remove(req.url);
   }
+
+  if (req.url.path == "/prepare") {
+    # get rid of all query parameters
+    set req.url = querystring.remove(req.url);
+  }
+
   %{ if contains(["staging", "production"], environment) }
   # Save original request url because req.url changes after restarts.
   if (req.restarts < 1) {

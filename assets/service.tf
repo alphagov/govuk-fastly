@@ -53,7 +53,7 @@ resource "fastly_service_vcl" "service" {
   product_enablement {
     ddos_protection {
       enabled = true
-      mode    = "block"
+      mode    = "log"
     }
     domain_inspector      = true
     log_explorer_insights = true

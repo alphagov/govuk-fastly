@@ -265,8 +265,8 @@ sub vcl_recv {
   }
 
   if (req.url.path == "/prepare") {
-    # get rid of all query parameters
-    set req.url = querystring.remove(req.url);
+    # redirect to campaigns
+    error 607 "redirect";
   }
 
   %{ if contains(["staging", "production"], environment) }
@@ -681,6 +681,15 @@ sub vcl_error {
       }
 
   ${indent(2, file("${module_path}/../shared/_security_txt_response.vcl"))}
+
+  if (obj.status == 607) {
+    set obj.status = 307;
+    set obj.http.Location = "https://prepare.campaign.gov.uk";
+    set obj.http.Cache-Control = "max-age=60, public";
+    set obj.response = "Temporary Redirect";
+    synthetic {""};
+    return (deliver);
+  }
 
   %{ if basic_authentication != null }
   if (obj.status == 401) {

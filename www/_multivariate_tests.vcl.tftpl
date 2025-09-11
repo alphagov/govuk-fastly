@@ -4,7 +4,7 @@ if (req.http.Cookie ~ "cookies_policy" && req.http.Cookie:cookies_policy ~ "%22u
 %{ for test_config in ab_tests ~}
 %{ for test, variants in test_config ~}
   if (table.lookup(active_ab_tests, "${test}") == "true") {
-    if (req.http.User-Agent ~ "^GOV\.UK Crawler Worker") {
+    if (req.http.User-Agent ~ "^govuk-mirror-bot") {
       set req.http.GOVUK-ABTest-${test} = "${variants[0]}";
 %{ for variant in variants ~}
     } else if (req.url ~ "[\?\&]ABTest-${test}=${variant}(&|$)") {

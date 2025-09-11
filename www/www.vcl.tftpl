@@ -544,7 +544,7 @@ sub vcl_deliver {
   # ensures that most visitors to the site aren't assigned an irrelevant test
   # cookie.
   if (req.url ~ "^/help/ab-testing"
-    && req.http.User-Agent !~ "^GOV\.UK Crawler Worker"
+    && req.http.User-Agent !~ "^govuk-mirror-bot"
     && req.http.GOVUK-ABTest-Example-Cookie != "sent_in_request") {
     # Set a fairly short cookie expiry because this is just an A/B test demo.
     add resp.http.Set-Cookie = "ABTest-Example=" req.http.GOVUK-ABTest-Example "; secure; expires=" now + 1d;
@@ -552,7 +552,7 @@ sub vcl_deliver {
 
 %{ if ab_tests != [] ~}
   declare local var.expiry TIME;
-  if (req.http.Usage-Cookies-Opt-In == "true" && req.http.User-Agent !~ "^GOV\.UK Crawler Worker") {
+  if (req.http.Usage-Cookies-Opt-In == "true" && req.http.User-Agent !~ "^govuk-mirror-bot") {
 %{ for test_config in ab_tests ~}
 %{ for test, _ in test_config ~}
 %{ if test != "Example" ~}

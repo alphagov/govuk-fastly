@@ -172,6 +172,7 @@ acl allowed_ip_addresses {
 %{ endif ~}
 
 sub vcl_recv {
+#FASTLY recv
   declare local var.backend_override STRING;
 
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
@@ -335,7 +336,6 @@ sub vcl_recv {
     set req.http.Authorization = "Basic ${basic_authentication}";
   }
 %{ endif ~}
-#FASTLY recv
 
   # GOV.UK accounts
   if (req.http.Cookie ~ "__Host-govuk_account_session") {
@@ -510,6 +510,7 @@ sub vcl_miss {
 }
 
 sub vcl_deliver {
+#FASTLY deliver
   set resp.http.Strict-Transport-Security = "max-age=31536000; preload";
 
   if (fastly_info.state ~ "^HIT") {
@@ -566,10 +567,10 @@ sub vcl_deliver {
 %{ endfor ~}
 %{ endif ~}
   }
-#FASTLY deliver
 }
 
 sub vcl_error {
+#FASTLY error
   if (obj.status == 801) {
     set obj.status = 301;
     set obj.response = "Moved Permanently";
@@ -716,8 +717,6 @@ sub vcl_error {
     </html>"};
 
   return (deliver);
-
-#FASTLY error
 }
 
 # pipe cannot be included.

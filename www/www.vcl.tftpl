@@ -179,11 +179,6 @@ sub vcl_recv {
   # Require authentication for PURGE requests
   set req.http.Fastly-Purge-Requires-Auth = "1";
 
-  # Reset proxy headers at the boundary to our network.
-  unset req.http.Client-IP;
-  set req.http.X-Forwarded-For = req.http.Fastly-Client-IP;
-  set req.http.X-Forwarded-Host = req.http.host;
-
   if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
     set req.http.Client-JA3 = tls.client.ja3_md5;
   }

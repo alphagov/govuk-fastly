@@ -160,7 +160,7 @@ resource "fastly_service_vcl" "service" {
           "index": "${each.value.index}",
           "source": "%%{server.region}V:%%{server.datacenter}V:%%{server.hostname}V",
           "sourcetype": "csv:govukcdn_extended",
-          "event": "%h %t \\"%r\\" %>s %%{json.escape(%b)}V \\"%%{json.escape(Content-Type)}o\\" \\"%%{json.escape(User-Agent)}i\\" \\"%%{json.escape(Referer)}i\\" \\"%%{json.escape(X-Forwarded-For)}i\\" \\"%%{json.escape(Accept)}i\\" %%{fastly_info.state}V"
+          "event": "%h %t \\"%r\\" %>s %%{json.escape(%b)}V \\"%%{json.escape(resp.http.Content-Type)}V\\" \\"%%{json.escape(req.http.User-Agent)}V\\" \\"%%{json.escape(req.http.Referer)}V\\" \\"%%{json.escape(req.http.X-Forwarded-For)}V\\" \\"%%{json.escape(req.http.Accept)}V\\" %%{fastly_info.state}V"
         }
         EOT
       ))

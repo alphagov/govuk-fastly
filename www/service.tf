@@ -185,7 +185,7 @@ resource "fastly_service_vcl" "service" {
           "index": "${each.value.index}",
           "source": "%%{server.region}V:%%{server.datacenter}V:%%{server.hostname}V",
           "sourcetype": "csv:govukcdn",
-          "event": "%h %t \\"%r\\" %>s %b \\"%%{Content-Type}o\\" \\"%%{User-Agent}i\\" \\"%%{Referer}i\\" \\"%%{X-Forwarded-For}i\\" \\"%%{Accept}i\\" %%{fastly_info.state}V"
+          "event": "%h %t \\"%r\\" %>s %%{json.escape(bytes_written)}V⁣ \\"%%{Content-Type}o\\" \\"%%{User-Agent}i\\" \\"%%{Referer}i\\" \\"%%{X-Forwarded-For}i\\" \\"%%{Accept}i\\" %%{fastly_info.state}V"
         }
         EOT
       ))

@@ -1,3 +1,6 @@
+penaltybox pb{}
+ratecounter rc{}
+
 backend F_origin {
     .connect_timeout = 5s;
     .dynamic = true;
@@ -171,6 +174,12 @@ acl allowed_ip_addresses {
 }
 %{ endif ~}
 
+acl rate_limit_allow_list {
+    %{ for ip in formatted_rate_limit_allow_list ~}
+    ${ip};
+    %{ endfor ~}
+}
+
 sub vcl_recv {
   declare local var.backend_override STRING;
 
@@ -182,6 +191,31 @@ sub vcl_recv {
   if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
     set req.http.Client-JA3 = tls.client.ja3_md5;
   }
+
+  # Rate limiting
+  if(!(client.ip ~ rate_limit_allow_list)) {
+      ## /bank-holidays.json
+      declare local var.bank_holidays_rps_limit INTEGER = 10;
+      if (
+        fastly.ff.visits_this_service == 0
+        && req.url.path == "/bank-holidays.json"
+        && ratelimit.check_rate(client.ip, rc, 1, 10, var.bank_holidays_rps_limit, pb, 1m)
+      ) {
+        set req.http.Fastly-SEC-RateLimit = "true";
+        error 429 "Too many requests";
+      }
+
+      ## everything else
+      declare local var.global_rps_limit INTEGER = 100;
+      if (
+        fastly.ff.visits_this_service == 0
+        && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 1m)
+      ) {
+        set req.http.Fastly-SEC-RateLimit = "true";
+        error 429 "Too many requests";
+      }
+  }
+
   %{ if environment == "staging" }
   # Only allow connections from allowed IP addresses in staging
   if (! (req.http.True-Client-IP ~ allowed_ip_addresses)) {
@@ -220,7 +254,7 @@ sub vcl_recv {
   if (!req.http.Fastly-SSL) {
      error 801 "Force SSL";
   }
-
+  
   # Reject unimplemented and non-standard HTTP methods
   if (req.method !~ "^(GET|HEAD|POST|PUT|DELETE|OPTIONS|PATCH|FASTLYPURGE)") {
     error 806 "Not Implemented";

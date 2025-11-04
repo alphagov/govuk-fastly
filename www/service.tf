@@ -9,8 +9,14 @@ locals {
   allowed_cidrs = [
     for v in local.ip_allowlist : strcontains(v, "/") ? v : "${v}/32"
   ]
+  ratelimit_allow_list_cidrs = [
+    for v in try(local.secrets["ratelimit_allow_list_ip_addresses"], []) : strcontains(v, "/") ? v : "${v}/32"
+  ]
   formatted_allowed_ips = [
     for v in local.allowed_cidrs : format("\"%s\"/%s", split("/", v)[0], split("/", v)[1])
+  ]
+  formatted_rate_limit_allow_list = [
+    for v in local.ratelimit_allow_list_cidrs : format("\"%s\"/%s", split("/", v)[0], split("/", v)[1])
   ]
 
   template_values = merge(
@@ -46,7 +52,8 @@ locals {
       environment = var.environment
     },
     { # computed values
-      formatted_allowed_ip_addresses = local.formatted_allowed_ips
+      formatted_allowed_ip_addresses  = local.formatted_allowed_ips
+      formatted_rate_limit_allow_list = local.formatted_rate_limit_allow_list
       ab_tests_rendered = templatefile(
         "${path.module}/_multivariate_tests.vcl.tftpl",
         { ab_tests = local.ab_tests }

@@ -180,6 +180,37 @@ acl rate_limit_allow_list {
     %{ endfor ~}
 }
 
+sub apply_all_rate_limits {
+  # Rate limiting
+  if(!(client.ip ~ rate_limit_allow_list)) {
+      call apply_rate_limit_bank_holidays();
+      call apply_rate_limit_global();
+  }
+}
+
+sub apply_rate_limit_bank_holidays {
+      declare local var.bank_holidays_rps_limit INTEGER = 10;
+      if (
+        fastly.ff.visits_this_service == 0
+        && req.url.path == "/bank-holidays.json"
+        && ratelimit.check_rate(client.ip, rc, 1, 10, var.bank_holidays_rps_limit, pb, 1m)
+      ) {
+        set req.http.Fastly-SEC-RateLimit = "true";
+        return (error 429 "Too many requests");
+      }
+}
+
+sub apply_rate_limit_global {
+      declare local var.global_rps_limit INTEGER = 100;
+      if (
+        fastly.ff.visits_this_service == 0
+        && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 1m)
+      ) {
+        set req.http.Fastly-SEC-RateLimit = "true";
+        return (error 429 "Too many requests");
+      }
+}
+
 sub vcl_recv {
   declare local var.backend_override STRING;
 
@@ -190,30 +221,6 @@ sub vcl_recv {
 
   if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
     set req.http.Client-JA3 = tls.client.ja3_md5;
-  }
-
-  # Rate limiting
-  if(!(client.ip ~ rate_limit_allow_list)) {
-      ## /bank-holidays.json
-      declare local var.bank_holidays_rps_limit INTEGER = 10;
-      if (
-        fastly.ff.visits_this_service == 0
-        && req.url.path == "/bank-holidays.json"
-        && ratelimit.check_rate(client.ip, rc, 1, 10, var.bank_holidays_rps_limit, pb, 1m)
-      ) {
-        set req.http.Fastly-SEC-RateLimit = "true";
-        error 429 "Too many requests";
-      }
-
-      ## everything else
-      declare local var.global_rps_limit INTEGER = 100;
-      if (
-        fastly.ff.visits_this_service == 0
-        && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 1m)
-      ) {
-        set req.http.Fastly-SEC-RateLimit = "true";
-        error 429 "Too many requests";
-      }
   }
 
   %{ if environment == "staging" }
@@ -541,6 +548,7 @@ sub vcl_hit {
 }
 
 sub vcl_miss {
+    call apply_all_rate_limits();
 #FASTLY miss
 }
 

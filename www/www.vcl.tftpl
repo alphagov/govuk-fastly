@@ -196,7 +196,7 @@ sub apply_rate_limit_bank_holidays {
         && ratelimit.check_rate(client.ip, rc, 1, 10, var.bank_holidays_rps_limit, pb, 1m)
       ) {
         set req.http.Fastly-SEC-RateLimit = "true";
-        return (error 429 "Too many requests");
+        error 429 "Too many requests";
       }
 }
 
@@ -207,7 +207,7 @@ sub apply_rate_limit_global {
         && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 1m)
       ) {
         set req.http.Fastly-SEC-RateLimit = "true";
-        return (error 429 "Too many requests");
+        error 429 "Too many requests";
       }
 }
 

@@ -23,3 +23,8 @@ variable "tls_subscription_domains" {
   type    = list(string)
   default = []
 }
+
+variable "tls_subscription_domain_imports" {
+  type    = map(string)
+  default = {}
+}

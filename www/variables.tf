@@ -18,3 +18,8 @@ variable "vcl_template_file" {
   type    = string
   default = "www.vcl.tftpl"
 }
+
+variable "tls_subscription_domains" {
+  type    = list(string)
+  default = []
+}

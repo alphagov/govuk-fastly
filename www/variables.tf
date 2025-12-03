@@ -20,8 +20,8 @@ variable "vcl_template_file" {
 }
 
 variable "tls_subscription_domains" {
-  type    = string
-  default = "[]"
+  type    = list(string)
+  default = []
 }
 
 variable "tls_subscription_domain_imports" {

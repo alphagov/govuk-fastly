@@ -5,7 +5,7 @@ terraform {
       tags = ["fastly", "www"]
     }
   }
-  required_version = "~> 1.7"
+  required_version = "~> 1.12"
   required_providers {
     fastly = {
       source  = "fastly/fastly"

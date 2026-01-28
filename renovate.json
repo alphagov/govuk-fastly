@@ -1,3 +1,3 @@
 {
-  "extends": ["github>alphagov/govuk-infrastructure/renovate"]
+  "extends": ["github>alphagov/govuk-infrastructure:renovate"]
 }

@@ -14,7 +14,7 @@ jobs:
         show-progress: false
 
     - name: Determine Terraform version to use
-      uses: dflook/terraform-version@c397d406dba225ea3a19d04a7308a310f0fc83f1 #v2.2.2
+      uses: dflook/terraform-version@8ee89d962417ed259f9d75e7529e262637c7e5a8 # v2.2.3
       id: terraform-version
 
     - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2

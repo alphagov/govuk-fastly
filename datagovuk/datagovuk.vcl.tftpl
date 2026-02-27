@@ -105,10 +105,12 @@ sub vcl_recv {
   # Sort query params (improve cache hit rate)
   set req.url = querystring.sort(req.url);
 
+  %{ if environment != "integration" ~}
   # Remove all query parameters from homepage
   if (req.url.path == "/") {
     set req.url = querystring.remove(req.url);
   }
+  %{ endif ~}
 
   # Serve from stale for 24 hours if origin is sick
   set req.max_stale_if_error = 24h;

@@ -78,4 +78,12 @@ resource "fastly_service_vcl" "mobile_backend_service" {
     source      = "\"${local.access_control_allow_origin}\""
   }
 
+  header {
+    destination = "http.Fastly-Purge-Requires-Auth"
+    type        = "request"
+    action      = "set"
+    name        = "Add Fastly-Purge-Requires-Auth header"
+    source      = "1"
+  }
+
 }

@@ -83,7 +83,7 @@ resource "fastly_service_vcl" "mobile_backend_service" {
     type        = "request"
     action      = "set"
     name        = "Add Fastly-Purge-Requires-Auth header"
-    source      = "1"
+    source      = "\"1\""
   }
 
 }

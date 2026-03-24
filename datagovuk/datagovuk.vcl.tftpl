@@ -181,6 +181,14 @@ sub vcl_fetch {
     return (deliver);
   }
 
+  %{ if contains(["staging", "integration"], environment) ~}
+  # Set the Cache-Control header for /find-assets/ and sub-paths for 1 year
+  if (req.url ~ "^/find-assets/" && beresp.status == 200) {
+    set beresp.http.Cache-Control = "public, max-age=31536000, immutable";
+    set beresp.ttl = 31536000s;
+  }
+  %{ endif ~}
+
   if (beresp.http.Expires || beresp.http.Surrogate-Control ~ "max-age" || beresp.http.Cache-Control ~"(s-maxage|max-age)") {
     # keep the ttl here
   } else {

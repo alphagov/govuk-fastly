@@ -1,2 +1,5 @@
 # All changes require platform engineering review
 * @alphagov/gov-uk-platform-engineering
+
+# Data.GOV.UK (DGU)
+/datagovuk/ @alphagov/gov-uk-platform-engineering @alphagov/national-data-library

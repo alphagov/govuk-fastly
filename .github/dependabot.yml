@@ -1,18 +1,24 @@
+---
 version: 2
 updates:
-  - package-ecosystem: pip
-    directory: /diff-generator/
-    schedule:
-      interval: daily
-  - package-ecosystem: terraform
-    directories:
-      - /assets
-      - /bouncer
-      - /datagovuk
-      - /logs
-      - /mobile-backend
-      - /service-domain-redirect
-      - /tld-redirect
-      - /www
-    schedule:
-      interval: daily
+- package-ecosystem: pip
+  directory: /diff-generator/
+  schedule:
+    interval: daily
+  cooldown:
+    default-days: 10
+- package-ecosystem: terraform
+  directories:
+  - /assets
+  - /bouncer
+  - /datagovuk
+  - /logs
+  - /mobile-backend
+  - /service-domain-redirect
+  - /tld-redirect
+  - /www
+  schedule:
+    interval: daily
+  cooldown:
+    default-days: 10
+...

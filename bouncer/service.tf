@@ -5,7 +5,6 @@ data "http" "domains" {
 locals {
   secrets = yamldecode(var.secrets)
 
-  dictionaries = yamldecode(file("../dictionaries.yaml"))
   domains_json = jsondecode(data.http.domains.response_body)
   domains = {
     for d in local.domains_json.results :
@@ -23,13 +22,6 @@ resource "fastly_service_vcl" "service" {
     content {
       name    = each.key
       comment = ""
-    }
-  }
-
-  dynamic "dictionary" {
-    for_each = local.dictionaries
-    content {
-      name = dictionary.key
     }
   }
 

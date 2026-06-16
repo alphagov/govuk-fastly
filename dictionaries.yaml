@@ -13,13 +13,6 @@ example_percentages:
 bankholidaystest_percentages:
   A: 99
   B: 1
-bouncer_rate_limits:
-  response_3xx_window: "10"
-  response_3xx_rps:    "3"
-  response_3xx_ttl:    "120s"
-  response_4xx_window: "1"
-  response_4xx_rps:    "2"
-  response_4xx_ttl:    "120s"
 searchfreshnessboost_percentages:
   A: 0
   B: 0

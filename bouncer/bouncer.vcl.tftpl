@@ -38,28 +38,8 @@ acl purge_ip_allowlist {
   "3.9.56.99";
 }
 
-
-penaltybox rl_3xx_pb {}
-penaltybox rl_4xx_pb {}
-
-ratecounter rl_3xx_rc {}
-ratecounter rl_4xx_rc {}
-
-
 sub vcl_recv {
-  declare local var.rl_key STRING;
-
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
-
-  set var.rl_key = req.http.Fastly-Client-IP;
-
-  # Bouncer 3xx and 4xx Rate Limit Check
-  if (fastly.ff.visits_this_service == 0) {
-    if (ratelimit.penaltybox_has(var.rl_key, rl_4xx_pb) ||
-        ratelimit.penaltybox_has(var.rl_key, rl_3xx_pb)) {
-      error 429 "Too many requests";
-    }
-  }
 
   # Require authentication for FASTLYPURGE requests unless from IP in ACL
   if (req.request == "FASTLYPURGE" && client.ip !~ purge_ip_allowlist) {
@@ -136,45 +116,7 @@ sub vcl_miss {
 }
 
 sub vcl_deliver {
-  #FASTLY deliver
-
-  declare local var.rl_key STRING;
-  set var.rl_key = req.http.Fastly-Client-IP;
-
-  # 4xx check:
-  if (resp.status >= 400 && resp.status < 500) {
-    if (
-      ratelimit.check_rate(
-        var.rl_key,
-        rl_4xx_rc,
-        1,
-        std.atoi(table.lookup(bouncer_rate_limits, "response_4xx_window", "1")),
-        std.atoi(table.lookup(bouncer_rate_limits, "response_4xx_rps", "2")),
-        rl_4xx_pb,
-        std.duration(table.lookup(bouncer_rate_limits, "response_4xx_ttl", "120s"), 120s)
-      )
-    ) {
-      set resp.http.X-RateLimit-Triggered = "4xx";
-    }
-  }
-
-  # 3xx check:
-  if (resp.status >= 300 && resp.status < 400) {
-    if (
-      ratelimit.check_rate(
-        var.rl_key,
-        rl_3xx_rc,
-        1,
-        std.atoi(table.lookup(bouncer_rate_limits, "response_3xx_window", "10")),
-        std.atoi(table.lookup(bouncer_rate_limits, "response_3xx_rps", "3")),
-        rl_3xx_pb,
-        std.duration(table.lookup(bouncer_rate_limits, "response_3xx_ttl", "120s"), 120s)
-      )
-    ) {
-      set resp.http.X-RateLimit-Triggered = "3xx";
-    }
-  }
-
+#FASTLY deliver
 }
 
 sub vcl_error {

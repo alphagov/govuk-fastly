@@ -93,7 +93,7 @@ resource "fastly_service_vcl" "service" {
       ssl_cert_hostname = each.value.address
       ssl_sni_hostname  = each.value.address
       shield            = lookup(each.value, "shield", "london-uk")
-      keepalive_time    = 0
+      keepalive_time    = lookup(each.value, "keepalive_time", 0)
       healthcheck       = ""
       max_tls_version   = ""
       min_tls_version   = ""

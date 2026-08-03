@@ -14,6 +14,10 @@ backend F_awsorigin {
     .ssl_cert_hostname = "${aws_origin_hostname}";
     .ssl_sni_hostname = "${aws_origin_hostname}";
 
+%{ if keepalive_time > 0 ~}
+    .keepalive_time = ${keepalive_time}s;
+%{ endif ~}
+
     .probe = {
         .dummy = ${probe_dns_only};
         .request =

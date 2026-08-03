@@ -13,6 +13,8 @@ locals {
       basic_authentication = null
       probe_dns_only       = false
 
+      keepalive_time = 0
+
       # these values are needed even if mirrors aren't enabled in an environment
       s3_mirror_hostname         = null
       s3_mirror_prefix           = null

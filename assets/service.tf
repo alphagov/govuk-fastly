@@ -13,6 +13,9 @@ locals {
       basic_authentication = null
       probe_dns_only       = false
 
+      # Default Origin Shield location
+      shield = "london-uk"
+
       keepalive_time = 0
 
       # these values are needed even if mirrors aren't enabled in an environment

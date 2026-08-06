@@ -26,6 +26,9 @@ locals {
       ssl_ciphers          = "ECDHE-RSA-AES256-GCM-SHA384"
       basic_authentication = null
 
+      # Default Origin Shield location
+      shield = "london-uk"
+
       s3_static_assets_port     = 443
       s3_static_assets_hostname = null
 
@@ -259,4 +262,3 @@ resource "fastly_service_dictionary_items" "items" {
   items         = local.dictionaries[each.key]
   manage_items  = true
 }
-

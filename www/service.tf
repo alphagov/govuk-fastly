@@ -18,6 +18,11 @@ locals {
   formatted_rate_limit_allow_list = [
     for v in local.ratelimit_allow_list_cidrs : format("\"%s\"/%s", split("/", v)[0], split("/", v)[1])
   ]
+  basic_auth_from_secrets = lookup(local.secrets, "basic_authentication", null)
+  basic_authentication_list = (
+    local.basic_auth_from_secrets == null ? [] :
+    can(tolist(local.basic_auth_from_secrets)) ? tolist(local.basic_auth_from_secrets) : [local.basic_auth_from_secrets]
+  )
 
   template_values = merge(
     { # some defaults
@@ -58,7 +63,8 @@ locals {
         "${path.module}/_multivariate_tests.vcl.tftpl",
         { ab_tests = local.ab_tests }
       )
-      module_path = path.module
+      module_path               = path.module
+      basic_authentication_list = local.basic_authentication_list
     },
     var.configuration,
     local.secrets

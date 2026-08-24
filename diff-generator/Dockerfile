@@ -1,9 +1,14 @@
 FROM public.ecr.aws/lts/ubuntu:22.04_stable
 
+# See https://github.com/nodesource/distributions/wiki/Repository-Manual-Installation for node install instructions
 RUN apt-get update && \
   apt-get install -y curl gpg && \
-  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor > /usr/share/keyrings/nodesource.gpg && \
-  echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x jammy main" | tee /etc/apt/sources.list.d/nodesource.list && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  echo 'Types: deb\n\
+URIs: https://deb.nodesource.com/node_18.x/\n\
+Suites: nodistro\n\
+Components: main\n\
+Signed-By: /etc/apt/keyrings/nodesource.gpg' > /etc/apt/sources.list.d/nodesource.sources && \
   apt-get update && \
   apt-get install -y --no-install-recommends python3 python3-pip nodejs && \
   rm -r /var/lib/apt/lists /var/cache/apt/archives && \

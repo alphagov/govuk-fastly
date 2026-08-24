@@ -14,10 +14,10 @@ on:
 jobs:
   build-and-publish-image:
     name: Build and publish image
-    uses: alphagov/govuk-infrastructure/.github/workflows/build-and-push-multiarch-image.yml@main
+    uses: alphagov/govuk-infrastructure/.github/workflows/build-push-arm-image.yml@main
     with:
       gitRef: ${{ inputs.gitRef || github.ref }}
-      dockerfilePath: diff-generator/Dockerfile 
+      dockerfilePath: diff-generator/Dockerfile
       context: diff-generator
       imageName: govuk-fastly-diff-generator
     permissions:

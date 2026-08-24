@@ -374,7 +374,7 @@ sub vcl_recv {
 
 %{ if basic_authentication != null ~}
   if (req.backend == F_origin) {
-    set req.http.Authorization = "Basic ${basic_authentication}";
+    set req.http.Authorization = "Basic ${basic_authentication_list[0]}";
   }
 %{ endif ~}
 #FASTLY recv

@@ -18,11 +18,8 @@ locals {
   formatted_rate_limit_allow_list = [
     for v in local.ratelimit_allow_list_cidrs : format("\"%s\"/%s", split("/", v)[0], split("/", v)[1])
   ]
-  basic_auth_from_secrets = lookup(local.secrets, "basic_authentication", null)
-  basic_authentication_list = (
-    local.basic_auth_from_secrets == null ? [] :
-    can(tolist(local.basic_auth_from_secrets)) ? tolist(local.basic_auth_from_secrets) : [local.basic_auth_from_secrets]
-  )
+  basic_auth_from_secrets   = lookup(local.secrets, "basic_authentication", null)
+  basic_authentication_list = (local.basic_auth_from_secrets == null ? [] : flatten([local.basic_auth_from_secrets]))
 
   template_values = merge(
     { # some defaults

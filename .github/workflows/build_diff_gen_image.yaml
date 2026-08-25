@@ -24,22 +24,3 @@ jobs:
       id-token: write
       contents: read
       packages: write
-  tag-latest:
-    name: Tag built image as latest
-    needs: build-and-publish-image
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      packages: write
-    steps:
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
-          IMAGE_URI=ghcr.io/${{ github.repository_owner }}/govuk/govuk-fastly-diff-generator:${{ needs.build-and-publish-image.outputs.imageTag }}
-          LATEST_URI=ghcr.io/${{ github.repository_owner }}/govuk/govuk-fastly-diff-generator:latest
-          docker pull $IMAGE_URI
-          docker tag $IMAGE_URI $LATEST_URI
-          docker push $LATEST_URI

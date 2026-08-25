@@ -101,7 +101,7 @@ backend F_mirrorS3 {
 
 # Mirror backend for S3 replica
 backend F_mirrorS3Replica {
-    .connect_timeout = 1s;
+    .connect_timeout = 100s;
     .dynamic = true;
     .port = "${s3_mirror_replica_port}";
     .host = "${s3_mirror_replica_hostname}";

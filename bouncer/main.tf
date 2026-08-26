@@ -9,11 +9,11 @@ terraform {
   required_providers {
     fastly = {
       source  = "fastly/fastly"
-      version = "9.4.0"
+      version = "9.6.0"
     }
     http = {
       source  = "hashicorp/http"
-      version = "3.6.0"
+      version = "3.6.1"
     }
   }
 }

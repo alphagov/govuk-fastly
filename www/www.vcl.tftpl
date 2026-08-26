@@ -28,7 +28,7 @@ backend F_origin {
             "User-Agent: Fastly healthcheck"
             "Rate-Limit-Token: ${rate_limit_token}"
 %{ if basic_authentication != null ~}
-            "Authorization: Basic ${basic_authentication}"
+            "Authorization: Basic ${basic_authentication_list[0]}"
 %{ endif ~}
             "Connection: close";
         .threshold = 1;
@@ -249,7 +249,7 @@ sub vcl_recv {
     %{ if basic_authentication != null }
     if (! (client.ip ~ allowed_ip_addresses)) {
       # Check whether the basic auth credentials are correct in integration
-      if (req.http.Authorization != "Basic ${basic_authentication}") {
+      if (${join(" && ", [for val in basic_authentication_list : "req.http.Authorization != \"Basic ${val}\""])}) {
         error 401 "Unauthorized";
       }
     }
@@ -377,7 +377,7 @@ sub vcl_recv {
 
 %{ if basic_authentication != null ~}
   if (req.backend == F_origin) {
-    set req.http.Authorization = "Basic ${basic_authentication}";
+    set req.http.Authorization = "Basic ${basic_authentication_list[0]}";
   }
 %{ endif ~}
 #FASTLY recv

@@ -1,0 +1,20 @@
+---
+name: Build diff generator image
+
+on:
+  pull_request:
+    paths:
+      - "diff-generator/*"
+      - ".github/workflows/pr_diff_gen_image.yaml"
+jobs:
+  build-diff-gen-image:
+    uses: alphagov/govuk-infrastructure/.github/workflows/build-image-from-pr.yml@main
+    with:
+      gitRef: ${{ github.ref }}
+      dockerfilePath: diff-generator/Dockerfile 
+      context: diff-generator
+      imageName: govuk-fastly-diff-generator
+    permissions:
+      id-token: write
+      contents: read
+      packages: write

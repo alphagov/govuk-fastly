@@ -14,32 +14,13 @@ on:
 jobs:
   build-and-publish-image:
     name: Build and publish image
-    uses: alphagov/govuk-infrastructure/.github/workflows/build-and-push-multiarch-image.yml@788b98389ac2003202dc421f4ccd187ad85cda17 # main
+    uses: alphagov/govuk-infrastructure/.github/workflows/build-push-arm-image.yml@main
     with:
       gitRef: ${{ inputs.gitRef || github.ref }}
-      dockerfilePath: diff-generator/Dockerfile 
+      dockerfilePath: diff-generator/Dockerfile
       context: diff-generator
       imageName: govuk-fastly-diff-generator
     permissions:
       id-token: write
       contents: read
       packages: write
-  tag-latest:
-    name: Tag built image as latest
-    needs: build-and-publish-image
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      packages: write
-    steps:
-      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
-          IMAGE_URI=ghcr.io/${{ github.repository_owner }}/govuk/govuk-fastly-diff-generator:${{ needs.build-and-publish-image.outputs.imageTag }}
-          LATEST_URI=ghcr.io/${{ github.repository_owner }}/govuk/govuk-fastly-diff-generator:latest
-          docker pull $IMAGE_URI
-          docker tag $IMAGE_URI $LATEST_URI
-          docker push $LATEST_URI

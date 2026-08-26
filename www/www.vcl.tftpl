@@ -194,6 +194,7 @@ sub apply_rate_limit_bank_holidays {
       declare local var.bank_holidays_rps_limit INTEGER = 10;
       if (
         fastly.ff.visits_this_service == 0
+        && req.restarts == 0
         && req.url.path == "/bank-holidays.json"
         && ratelimit.check_rate(client.ip, rc, 1, 10, var.bank_holidays_rps_limit, pb, 1m)
       ) {
@@ -206,6 +207,7 @@ sub apply_rate_limit_global {
       declare local var.global_rps_limit INTEGER = 100;
       if (
         fastly.ff.visits_this_service == 0
+        && req.restarts == 0
         && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 1m)
       ) {
         set req.http.Fastly-SEC-RateLimit = "true";

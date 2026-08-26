@@ -1,3 +1,6 @@
+penaltybox pb{}
+ratecounter rc{}
+
 backend F_awsorigin {
     .connect_timeout = 5s;
     .dynamic = true;
@@ -171,6 +174,20 @@ acl purge_ip_allowlist {
 %{ endif ~}
 }
 
+sub apply_rate_limit_global {
+  declare local var.global_rps_limit INTEGER = 100;
+
+  if (
+    fastly.ff.visits_this_service == 0
+    && req.restarts == 0
+    && req.request ~ "^(GET|PUT|TRACE|POST|HEAD|DELETE|PATCH|OPTIONS)$"
+    && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 5s)
+  ) {
+    set req.http.Fastly-SEC-RateLimit = "true";
+    error 429 "Too many requests";
+  }
+}
+
 sub vcl_recv {
   # Shared boundary headers
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
@@ -191,6 +208,8 @@ sub vcl_recv {
     }
   }
   # END: Edge-only processing
+
+  call apply_rate_limit_global();
 
   # Force SSL.
   if (!req.http.Fastly-SSL) {

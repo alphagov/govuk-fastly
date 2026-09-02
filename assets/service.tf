@@ -13,6 +13,9 @@ locals {
       basic_authentication = null
       probe_dns_only       = false
 
+      # Default Origin Shield location
+      shield = "london-uk"
+
       keepalive_time = 0
 
       # these values are needed even if mirrors aren't enabled in an environment
@@ -111,24 +114,6 @@ resource "fastly_service_vcl" "service" {
     for_each = local.dictionaries
     content {
       name = dictionary.key
-    }
-  }
-
-  rate_limiter {
-    name = "rate_limiter_assets_${local.template_values["environment"]}"
-
-    rps_limit            = 100
-    window_size          = 10
-    penalty_box_duration = 5
-
-    client_key   = "req.http.Fastly-Client-IP"
-    http_methods = "GET,PUT,TRACE,POST,HEAD,DELETE,PATCH,OPTIONS"
-
-    action = "response"
-    response {
-      content      = "Too many requests"
-      content_type = "plain/text"
-      status       = 429
     }
   }
 

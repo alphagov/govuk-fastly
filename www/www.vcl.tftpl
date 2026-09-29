@@ -10,8 +10,6 @@ backend F_origin {
     .max_connections = 200;
     .between_bytes_timeout = 10s;
 
-    .shield = "${shield}";
-
     .ssl = true;
     .ssl_check_cert = always;
     .min_tls_version = "${minimum_tls_version}";

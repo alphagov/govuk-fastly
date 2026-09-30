@@ -197,7 +197,7 @@ sub apply_rate_limit_bank_holidays {
         && ratelimit.check_rate(client.ip, rc, 1, 10, var.bank_holidays_rps_limit, pb, 1m)
       ) {
         set req.http.Fastly-SEC-RateLimit = "true";
-        error 429 "Too many requests";
+        error 829 "Too many requests";
       }
 }
 
@@ -209,7 +209,7 @@ sub apply_rate_limit_global {
         && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 1m)
       ) {
         set req.http.Fastly-SEC-RateLimit = "true";
-        error 429 "Too many requests";
+        error 829 "Too many requests";
       }
 }
 
@@ -219,11 +219,11 @@ sub vcl_recv {
   # Shared boundary headers
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
-  # Require authentication for PURGE requests
-  set req.http.Fastly-Purge-Requires-Auth = "1";
-
   # Edge-only processing (run once at outer edge POP - skip the shield POP)
   if (fastly.ff.visits_this_service == 0 && req.restarts == 0) {
+    # Require authentication for PURGE requests
+    set req.http.Fastly-Purge-Requires-Auth = "1";
+
     set req.http.Client-JA3 = tls.client.ja3_md5;
 
     # Set a unique request id at the outer edge to trace requests end-to-end
@@ -551,7 +551,9 @@ sub vcl_hit {
 }
 
 sub vcl_miss {
+  if (fastly.ff.visits_this_service == 0) {
     call apply_all_rate_limits();
+  }
 #FASTLY miss
 }
 
@@ -729,7 +731,7 @@ sub vcl_error {
   # https://docs.fastly.com/guides/performance-tuning/serving-stale-content
   # The use of `req.restarts == 0` condition is to enforce the restriction
   # of serving stale only when the backend is the origin.
-  if ((req.restarts == 0) && (obj.status >= 500 && obj.status < 600)) {
+  if ((req.restarts == 0 || (req.restarts == 1 && fastly.ff.visits_this_service == 0)) && (obj.status >= 500 && obj.status < 600)) {
     /* deliver stale object if it is available */
     if (stale.exists) {
       return(deliver_stale);
@@ -756,6 +758,9 @@ sub vcl_error {
 # pipe cannot be included.
 
 sub vcl_pass {
+  if (fastly.ff.visits_this_service == 0) {
+    call apply_all_rate_limits();
+  }
 #FASTLY pass
 }
 

@@ -180,7 +180,7 @@ sub apply_rate_limit_global {
     fastly.ff.visits_this_service == 0
     && req.restarts == 0
     && req.request ~ "^(GET|PUT|TRACE|POST|HEAD|DELETE|PATCH|OPTIONS)$"
-    && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 5s)
+    && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 5m)
   ) {
     set req.http.Fastly-SEC-RateLimit = "true";
     error 429 "Too many requests";

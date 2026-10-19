@@ -9,6 +9,23 @@ locals {
   formatted_allowed_ips = [
     for v in local.allowed_cidrs : format("\"%s\"/%s", split("/", v)[0], split("/", v)[1])
   ]
+
+  new_origin_envs = ["integration"]
+  new_origin_enabled = (
+    contains(local.new_origin_envs, var.environment)
+    && try(local.secrets.new_origin_hostname, null) != null
+  )
+  new_origin_percent = lookup({
+    integration = 0
+    staging     = 0
+    production  = 0
+  }, var.environment, 0)
+  new_origin_backend = lookup({
+    integration = "F_www_integration_origin_data_gov_uk"
+    staging     = "F_www_staging_origin_data_gov_uk"
+    production  = "F_www_origin_data_gov_uk"
+  }, var.environment, null)
+
   template_values = merge(
     { # some defaults
       origin_port          = 443
@@ -16,6 +33,7 @@ locals {
       ssl_ciphers          = "ECDHE-RSA-AES256-GCM-SHA384"
       basic_authentication = null
       probe_dns_only       = true
+      new_origin_hostname  = null
 
       # these values are needed even if mirrors aren't enabled in an environment
       s3_mirror_hostname         = null
@@ -43,7 +61,12 @@ locals {
       module_path                    = path.module
     },
     var.configuration,
-    local.secrets
+    local.secrets,
+    {
+      new_origin_enabled = local.new_origin_enabled
+      new_origin_percent = local.new_origin_percent
+      new_origin_backend = local.new_origin_backend
+    }
   )
 }
 
@@ -73,6 +96,13 @@ resource "fastly_service_vcl" "service" {
     main    = true
     name    = "main"
     content = templatefile("${path.module}/${var.vcl_template_file}", local.template_values)
+  }
+
+  lifecycle {
+    precondition {
+      condition     = local.new_origin_percent == 0 || local.new_origin_enabled
+      error_message = "new_origin_percent > 0 but the new origin is not enabled for ${var.environment}."
+    }
   }
 
   dynamic "dictionary" {

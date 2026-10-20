@@ -14,6 +14,7 @@ locals {
   new_origin_enabled = (
     contains(local.new_origin_envs, var.environment)
     && try(local.secrets.new_origin_hostname, null) != null
+    && try(local.secrets.new_origin_token, null) != null
   )
   new_origin_percent = lookup({
     integration = 0
@@ -34,6 +35,7 @@ locals {
       basic_authentication = null
       probe_dns_only       = true
       new_origin_hostname  = null
+      new_origin_token     = null
 
       # these values are needed even if mirrors aren't enabled in an environment
       s3_mirror_hostname         = null

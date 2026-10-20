@@ -62,6 +62,7 @@ backend ${new_origin_backend} {
             "HEAD ${probe} HTTP/1.1"
             "Host: ${new_origin_hostname}"
             "User-Agent: Fastly healthcheck"
+            "X-Origin-Token: ${new_origin_token}"
             "Connection: close";
         .threshold = 1;
         .window = 2;
@@ -261,6 +262,12 @@ sub vcl_hit {
 
 sub vcl_miss {
 #FASTLY miss
+%{ if new_origin_enabled ~}
+
+  if (req.backend == ${new_origin_backend}) {
+    set bereq.http.X-Origin-Token = "${new_origin_token}";
+  }
+%{ endif ~}
 }
 
 sub vcl_deliver {
@@ -314,4 +321,10 @@ sub vcl_error {
 
 sub vcl_pass {
 #FASTLY pass
+%{ if new_origin_enabled ~}
+
+  if (req.backend == ${new_origin_backend}) {
+    set bereq.http.X-Origin-Token = "${new_origin_token}";
+  }
+%{ endif ~}
 }

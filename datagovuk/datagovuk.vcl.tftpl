@@ -167,6 +167,17 @@ sub vcl_recv {
     set req.backend = ${new_origin_backend};
     set req.http.Fastly-Backend-Name = "new_origin";
   }
+
+  # Force the new origin for testing, from allowed IPs only
+  if (req.restarts == 0
+      && req.http.X-Force-New-Origin == "1"
+      && client.ip ~ allowed_ip_addresses
+      && req.url.path !~ "^/(search|dataset)(/|$)") {
+    set req.backend = ${new_origin_backend};
+    set req.http.Fastly-Backend-Name = "new_origin";
+  } else {
+    unset req.http.X-Force-New-Origin;
+  }
 %{ endif ~}
 
   %{ if contains(["staging", "production"], environment) ~}
@@ -182,6 +193,11 @@ sub vcl_recv {
   if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
     return(pass);
   }
+%{ if new_origin_enabled ~}
+  if (req.http.X-Force-New-Origin) {
+    return(pass);
+  }
+%{ endif ~}
 
   return(lookup);
 }
@@ -202,6 +218,7 @@ sub vcl_fetch {
 
   # Retry on EKS if CloudFront rejects Fastly
   if (req.http.Fastly-Backend-Name == "new_origin"
+      && !req.http.X-Force-New-Origin
       && (beresp.status == 401 || beresp.status == 403)
       && req.restarts < 1 && (req.request == "GET" || req.request == "HEAD")) {
     restart;
@@ -322,6 +339,8 @@ sub vcl_error {
 sub vcl_pass {
 #FASTLY pass
 %{ if new_origin_enabled ~}
+
+  unset bereq.http.X-Force-New-Origin;
 
   if (req.backend == ${new_origin_backend}) {
     set bereq.http.X-Origin-Token = "${new_origin_token}";

@@ -6,7 +6,7 @@ active_ab_tests:
 ab_test_expiries:
   Example: 86400
   BankHolidaysTest: 86400
-  PostalVoteVideo: 86400
+  PostalVoteVideo: 144000
   SearchFreshnessBoost: 86400
 # AB test percentages
 example_percentages:
@@ -16,9 +16,9 @@ bankholidaystest_percentages:
   A: 99
   B: 1
 postalvotevideo_percentages:
-  A: 10
-  B: 10
-  Z: 80
+  A: 50
+  B: 50
+  Z: 0
 searchfreshnessboost_percentages:
   A: 0
   B: 0

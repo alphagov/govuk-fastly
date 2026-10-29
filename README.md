@@ -22,6 +22,7 @@ The VCL templates in this repository depend on secrets set in [govuk-fastly-secr
 
 ## File Structure
 
+* `alerts/` - account-wide Fastly alerting config (notification integrations and alerts), deployed to a single `govuk-fastly-alerts` workspace
 * `diff-generator/` - contains source code for diff generator Lambda function
 * `shared/` - contains common files that are used by multiple services
 * `www/ab_tests.yaml` - list of AB test variants

@@ -46,6 +46,11 @@ sub vcl_recv {
     set req.http.Fastly-Purge-Requires-Auth = "1";
   }
 
+  # Bouncer only serves redirects and pages; reject anything else at the edge
+  if (req.method !~ "^(GET|HEAD|FASTLYPURGE)$") {
+    error 806 "Method Not Allowed";
+  }
+
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
 
   # Serve from stale for 24 hours if origin is sick
@@ -143,6 +148,14 @@ sub vcl_error {
         </body>
       </html>"};
 
+    return (deliver);
+  }
+
+  if (obj.status == 806) {
+    set obj.status = 405;
+    set obj.response = "Method Not Allowed";
+    set obj.http.Allow = "GET, HEAD";
+    synthetic {""};
     return (deliver);
   }
 

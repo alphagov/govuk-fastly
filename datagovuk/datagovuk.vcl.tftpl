@@ -35,6 +35,45 @@ backend F_cname_find_eks_${environment}_govuk_digital {
     }
 %{ endif ~}
 }
+%{ if new_origin_enabled ~}
+
+backend ${new_origin_backend} {
+    .connect_timeout = 5s;
+    .dynamic = true;
+    .port = "${origin_port}";
+    .host = "${new_origin_hostname}";
+    .host_header = "${new_origin_hostname}";
+    .always_use_host_header = true;
+    .first_byte_timeout = 15s;
+    .max_connections = 200;
+    .between_bytes_timeout = 10s;
+
+    .ssl = true;
+    .ssl_check_cert = always;
+    .min_tls_version = "${minimum_tls_version}";
+    .ssl_ciphers = "${ssl_ciphers}";
+    .ssl_cert_hostname = "${new_origin_hostname}";
+    .ssl_sni_hostname = "${new_origin_hostname}";
+
+%{ if probe != null ~}
+    .probe = {
+        .dummy = false;
+        .request =
+            "HEAD ${probe} HTTP/1.1"
+            "Host: ${new_origin_hostname}"
+            "User-Agent: Fastly healthcheck"
+            "X-Origin-Token: ${new_origin_token}"
+            "Connection: close";
+        .threshold = 1;
+        .window = 2;
+        .timeout = 5s;
+        .initial = 1;
+        .expected_response = 200;
+        .interval = ${probe_interval};
+    }
+%{ endif ~}
+}
+%{ endif ~}
 
 %{ if environment != "production" ~}
 acl allowed_ip_addresses {
@@ -118,6 +157,28 @@ sub vcl_recv {
   # Default backend.
   set req.backend = F_cname_find_eks_${environment}_govuk_digital;
   set req.http.Fastly-Backend-Name = "origin";
+%{ if new_origin_enabled ~}
+
+  # Weighted split to the new origin. Solr backed paths stay on EKS
+  if (req.restarts == 0
+      && req.url.path !~ "^/(search|dataset)(/|$)"
+      && backend.${new_origin_backend}.healthy
+      && randombool(${new_origin_percent}, 100)) {
+    set req.backend = ${new_origin_backend};
+    set req.http.Fastly-Backend-Name = "new_origin";
+  }
+
+  # Force the new origin for testing, from allowed IPs only
+  if (req.restarts == 0
+      && req.http.X-Force-New-Origin == "1"
+      && client.ip ~ allowed_ip_addresses
+      && req.url.path !~ "^/(search|dataset)(/|$)") {
+    set req.backend = ${new_origin_backend};
+    set req.http.Fastly-Backend-Name = "new_origin";
+  } else {
+    unset req.http.X-Force-New-Origin;
+  }
+%{ endif ~}
 
   %{ if contains(["staging", "production"], environment) ~}
 
@@ -132,6 +193,11 @@ sub vcl_recv {
   if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
     return(pass);
   }
+%{ if new_origin_enabled ~}
+  if (req.http.X-Force-New-Origin) {
+    return(pass);
+  }
+%{ endif ~}
 
   return(lookup);
 }
@@ -148,6 +214,16 @@ sub vcl_fetch {
       restart;
     }
   }
+%{ if new_origin_enabled ~}
+
+  # Retry on EKS if CloudFront rejects Fastly
+  if (req.http.Fastly-Backend-Name == "new_origin"
+      && !req.http.X-Force-New-Origin
+      && (beresp.status == 401 || beresp.status == 403)
+      && req.restarts < 1 && (req.request == "GET" || req.request == "HEAD")) {
+    restart;
+  }
+%{ endif ~}
 
   set beresp.stale_if_error = 86400s;
 
@@ -203,6 +279,12 @@ sub vcl_hit {
 
 sub vcl_miss {
 #FASTLY miss
+%{ if new_origin_enabled ~}
+
+  if (req.backend == ${new_origin_backend}) {
+    set bereq.http.X-Origin-Token = "${new_origin_token}";
+  }
+%{ endif ~}
 }
 
 sub vcl_deliver {
@@ -256,4 +338,12 @@ sub vcl_error {
 
 sub vcl_pass {
 #FASTLY pass
+%{ if new_origin_enabled ~}
+
+  unset bereq.http.X-Force-New-Origin;
+
+  if (req.backend == ${new_origin_backend}) {
+    set bereq.http.X-Origin-Token = "${new_origin_token}";
+  }
+%{ endif ~}
 }

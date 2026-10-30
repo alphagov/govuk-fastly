@@ -39,6 +39,8 @@ acl purge_ip_allowlist {
 }
 
 sub vcl_recv {
+#FASTLY recv
+
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
   # Require authentication for FASTLYPURGE requests unless from IP in ACL
@@ -63,13 +65,6 @@ sub vcl_recv {
   if (req.restarts > 0) {
     set req.backend = sick_force_grace;
     set req.http.Fastly-Backend-Name = "stale";
-  }
-
-
-#FASTLY recv
-
-  if (req.request != "HEAD" && req.request != "GET" && req.request != "PURGE") {
-    return(pass);
   }
 
   return(lookup);

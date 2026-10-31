@@ -5,7 +5,7 @@ terraform {
       tags = ["fastly", "mobile-backend"]
     }
   }
-  required_version = "~> 1.16"
+  required_version = "~> 1.17"
   required_providers {
     fastly = {
       source  = "fastly/fastly"

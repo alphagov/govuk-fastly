@@ -39,11 +39,18 @@ acl purge_ip_allowlist {
 }
 
 sub vcl_recv {
+#FASTLY recv
+
   ${indent(2, file("${module_path}/../shared/_boundary_headers.vcl.tftpl"))}
 
   # Require authentication for FASTLYPURGE requests unless from IP in ACL
   if (req.request == "FASTLYPURGE" && client.ip !~ purge_ip_allowlist) {
     set req.http.Fastly-Purge-Requires-Auth = "1";
+  }
+
+  # Bouncer only serves redirects and pages; reject anything else at the edge
+  if (req.method !~ "^(GET|HEAD|FASTLYPURGE)$") {
+    error 806 "Method Not Allowed";
   }
 
   ${indent(2, file("${module_path}/../shared/_security_txt_request.vcl"))}
@@ -58,13 +65,6 @@ sub vcl_recv {
   if (req.restarts > 0) {
     set req.backend = sick_force_grace;
     set req.http.Fastly-Backend-Name = "stale";
-  }
-
-
-#FASTLY recv
-
-  if (req.request != "HEAD" && req.request != "GET" && req.request != "PURGE") {
-    return(pass);
   }
 
   return(lookup);
@@ -143,6 +143,14 @@ sub vcl_error {
         </body>
       </html>"};
 
+    return (deliver);
+  }
+
+  if (obj.status == 806) {
+    set obj.status = 405;
+    set obj.response = "Method Not Allowed";
+    set obj.http.Allow = "GET, HEAD";
+    synthetic {""};
     return (deliver);
   }
 

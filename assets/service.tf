@@ -56,9 +56,18 @@ resource "fastly_service_vcl" "service" {
   }
 
   product_enablement {
+    bot_management {
+      contentguard = "on"
+      enabled      = true
+    }
     ddos_protection {
       enabled = true
       mode    = "block"
+    }
+    ngwaf {
+      enabled      = true
+      traffic_ramp = 100
+      workspace_id = "prod"
     }
     domain_inspector      = true
     log_explorer_insights = true

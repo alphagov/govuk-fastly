@@ -1,4 +1,16 @@
 %{ if ab_tests != null ~}
+# Clients may send GOVUK-ABTest-* headers directly (e.g. for testing), but
+# only exact variant names are allowed through, e.g. "^(A|B|Z)$" for a test
+# with variants A, B and Z. Any other value is removed so it cannot create
+# new cache variants via Vary: GOVUK-ABTest-<test>.
+%{ for test_config in ab_tests ~}
+%{ for test, variants in test_config ~}
+if (req.http.GOVUK-ABTest-${test} && req.http.GOVUK-ABTest-${test} !~ "^(${join("|", variants)})$") {
+  unset req.http.GOVUK-ABTest-${test};
+}
+%{ endfor ~}
+%{ endfor ~}
+
 if (req.http.Cookie ~ "cookies_policy" && req.http.Cookie:cookies_policy ~ "%22usage%22:true") {
   set req.http.Usage-Cookies-Opt-In = "true";
 %{ for test_config in ab_tests ~}
@@ -12,8 +24,9 @@ if (req.http.Cookie ~ "cookies_policy" && req.http.Cookie:cookies_policy ~ "%22u
       # to place them into a specific bucket.
       set req.http.GOVUK-ABTest-${test} = "${variant}";
 %{ endfor ~}
-    } else if (req.http.Cookie ~ "ABTest-${test}") {
-      # Set the value of the header to whatever decision was previously made
+    } else if (req.http.Cookie:ABTest-${test} ~ "^(${join("|", variants)})$") {
+      # Reuse an earlier assignment, but only if the cookie holds a known
+      # variant. Anything else falls through and the visitor is reassigned.
       set req.http.GOVUK-ABTest-${test} = req.http.Cookie:ABTest-${test};
       set req.http.GOVUK-ABTest-${test}-Cookie = "sent_in_request";
     } else {

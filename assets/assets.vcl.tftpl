@@ -179,7 +179,7 @@ sub apply_rate_limit_global {
   if (
     fastly.ff.visits_this_service == 0
     && req.restarts == 0
-    && req.request ~ "^(GET|PUT|TRACE|POST|HEAD|DELETE|PATCH|OPTIONS)$"
+    && req.request ~ "^(GET|HEAD)$"
     && ratelimit.check_rate(client.ip, rc, 1, 10, var.global_rps_limit, pb, 5m)
   ) {
     set req.http.Fastly-SEC-RateLimit = "true";
@@ -207,6 +207,11 @@ sub vcl_recv {
     }
   }
   # END: Edge-only processing
+
+  # Assets only serves files; reject anything else at the edge
+  if (req.request !~ "^(GET|HEAD|FASTLYPURGE)$") {
+    error 806 "Method Not Allowed";
+  }
 
   call apply_rate_limit_global();
 
@@ -278,10 +283,6 @@ sub vcl_recv {
   %{ endif ~}
 
 #FASTLY recv
-
-  if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
-    return(pass);
-  }
 
   return(lookup);
 }
@@ -367,6 +368,14 @@ sub vcl_error {
     set obj.status = 301;
     set obj.response = "Moved Permanently";
     set obj.http.Location = "https://" req.http.host req.url;
+    synthetic {""};
+    return (deliver);
+  }
+
+  if (obj.status == 806) {
+    set obj.status = 405;
+    set obj.response = "Method Not Allowed";
+    set obj.http.Allow = "GET, HEAD";
     synthetic {""};
     return (deliver);
   }

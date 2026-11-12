@@ -232,18 +232,18 @@ sub vcl_recv {
     %{ if environment == "staging" }
     # Only allow connections from allowed IP addresses in staging
     if (! (req.http.True-Client-IP ~ allowed_ip_addresses)) {
-      error 403 "Forbidden";
+      error 803 "Forbidden";
     }
     %{ endif ~}
 
     # Check whether the remote IP address is in the list of blocked IPs
     if (table.lookup(ip_address_denylist, client.ip)) {
-      error 403 "Forbidden";
+      error 803 "Forbidden";
     }
 
     # Block requests that match a known bad signature
     if (table.lookup(ja3_signature_denylist, req.http.Client-JA3, "false") == "true") {
-      error 403 "Forbidden";
+      error 803 "Forbidden";
     }
 
     %{ if basic_authentication != null }
@@ -634,6 +634,35 @@ sub vcl_error {
     set obj.http.Location = "https://" req.http.host obj.response;
     set obj.response = "Moved";
     synthetic {""};
+    return (deliver);
+  }
+
+  # Deliver 403s raised in vcl_recv (IP/JA3 denylists, staging IP allowlist).
+  # Without this they fall through to the restart below, which skips the
+  # edge-only checks and serves the request from a mirror or origin.
+  if (obj.status == 803) {
+    set obj.status = 403;
+    set obj.response = "Forbidden";
+    set obj.http.Fastly-Backend-Name = "forbidden";
+
+    synthetic {"
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Welcome to GOV.UK</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; }
+            header { background: #1d70b8; }
+            h1 { color: white; font-size: 29px; margin: 0 auto; padding: 10px; max-width: 990px; }
+            p { color: black; margin: 30px auto; max-width: 990px; }
+          </style>
+        </head>
+        <body>
+          <header><h1>GOV.UK</h1></header>
+          <p>Sorry, you do not have permission to access this page.</p>
+        </body>
+      </html>"};
+
     return (deliver);
   }
 

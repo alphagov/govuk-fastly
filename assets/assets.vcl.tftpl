@@ -229,6 +229,10 @@ sub vcl_recv {
   set req.backend = F_awsorigin;
   set req.http.Fastly-Backend-Name = "awsorigin";
 
+  # Assets are addressed by path alone, so drop the query string. Otherwise
+  # arbitrary query strings could be used to bypass the cache.
+  set req.url = querystring.remove(req.url);
+
   %{ if contains(["staging", "production"], environment) ~}
 
   # Save original request url because req.url changes after restarts.

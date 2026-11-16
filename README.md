@@ -29,6 +29,8 @@ The VCL templates in this repository depend on secrets set in [govuk-fastly-secr
 
 Each other directory in the root of this repo is a Fastly service.
 
+[Uploaded assets](https://docs.publishing.service.gov.uk/manual/assets.html#uploaded-assets) are served from `assets`. [Static assets](https://docs.publishing.service.gov.uk/manual/assets.html#static-assets) are served from `www`.
+
 ## Getting Terraform Cloud access
 
 Terraform Cloud uses Google SSO for login. To create your account, go to the [SSO login page](https://app.terraform.io/sso/sign-in) and use the organisation name `govuk`. Your permissions are determined by which Google groups you are a member of.

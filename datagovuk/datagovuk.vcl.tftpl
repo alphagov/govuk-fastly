@@ -167,6 +167,7 @@ sub vcl_recv {
     set req.backend = ${new_origin_backend};
     set req.http.Fastly-Backend-Name = "new_origin";
   }
+%{ if environment != "production" ~}
 
   # Force the new origin for testing, from allowed IPs only
   if (req.restarts == 0
@@ -178,6 +179,10 @@ sub vcl_recv {
   } else {
     unset req.http.X-Force-New-Origin;
   }
+%{ else ~}
+
+  unset req.http.X-Force-New-Origin;
+%{ endif ~}
 %{ endif ~}
 
   %{ if contains(["staging", "production"], environment) ~}

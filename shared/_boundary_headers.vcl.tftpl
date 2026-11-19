@@ -14,3 +14,4 @@ set req.http.X-Forwarded-Server = server.hostname;
 
 # Discard user specified headers that we don't want to trust
 unset req.http.Client-IP;
+unset req.http.Forwarded;

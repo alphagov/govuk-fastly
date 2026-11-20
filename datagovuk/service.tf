@@ -17,7 +17,7 @@ locals {
     && try(local.secrets.new_origin_token, null) != null
   )
   new_origin_percent = lookup({
-    integration = 0
+    integration = 50
     staging     = 0
     production  = 0
   }, var.environment, 0)

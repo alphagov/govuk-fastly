@@ -8,7 +8,7 @@ on:
       - ".github/workflows/pr_diff_gen_image.yaml"
 jobs:
   build-diff-gen-image:
-    uses: alphagov/govuk-infrastructure/.github/workflows/build-image-from-pr.yml@main
+    uses: alphagov/govuk-infrastructure/.github/workflows/build-image-from-pr.yml@3a97c204e07d33a72955f4e73cb3f913a0943174 # main
     with:
       gitRef: ${{ github.ref }}
       dockerfilePath: diff-generator/Dockerfile 

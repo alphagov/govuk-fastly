@@ -183,6 +183,14 @@ sub vcl_recv {
 
   unset req.http.X-Force-New-Origin;
 %{ endif ~}
+
+  # Asset retry from EKS. ECS retries land on EKS by default
+  if (req.restarts == 0) {
+    unset req.http.X-Retry-New-Origin;
+  } else if (req.http.X-Retry-New-Origin && backend.${new_origin_backend}.healthy) {
+    set req.backend = ${new_origin_backend};
+    set req.http.Fastly-Backend-Name = "new_origin";
+  }
 %{ endif ~}
 
   %{ if contains(["staging", "production"], environment) ~}
@@ -226,6 +234,17 @@ sub vcl_fetch {
       && !req.http.X-Force-New-Origin
       && (beresp.status == 401 || beresp.status == 403)
       && req.restarts < 1 && (req.request == "GET" || req.request == "HEAD")) {
+    restart;
+  }
+
+  # Asset hashes differ between builds during a deploy gap
+  if (beresp.status == 404
+      && req.url.path ~ "^/assets/"
+      && !req.http.X-Force-New-Origin
+      && req.restarts < 1 && (req.request == "GET" || req.request == "HEAD")) {
+    if (req.http.Fastly-Backend-Name == "origin") {
+      set req.http.X-Retry-New-Origin = "1";
+    }
     restart;
   }
 %{ endif ~}
@@ -276,6 +295,12 @@ sub vcl_fetch {
     # apply the default ttl
     set beresp.ttl = ${default_ttl}s;
   }
+%{ if new_origin_enabled ~}
+
+  if (beresp.status == 404 && req.url.path ~ "^/assets/") {
+    set beresp.ttl = 10s;
+  }
+%{ endif ~}
 }
 
 sub vcl_hit {
@@ -285,6 +310,8 @@ sub vcl_hit {
 sub vcl_miss {
 #FASTLY miss
 %{ if new_origin_enabled ~}
+
+  unset bereq.http.X-Retry-New-Origin;
 
   if (req.backend == ${new_origin_backend}) {
     set bereq.http.X-Origin-Token = "${new_origin_token}";
@@ -346,6 +373,7 @@ sub vcl_pass {
 %{ if new_origin_enabled ~}
 
   unset bereq.http.X-Force-New-Origin;
+  unset bereq.http.X-Retry-New-Origin;
 
   if (req.backend == ${new_origin_backend}) {
     set bereq.http.X-Origin-Token = "${new_origin_token}";

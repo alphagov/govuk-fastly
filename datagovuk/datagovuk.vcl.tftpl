@@ -184,6 +184,14 @@ sub vcl_recv {
   unset req.http.X-Force-New-Origin;
 %{ endif ~}
 
+  # pin requests to EKS for the ECS reconciler process reading /version/
+  if (req.http.X-Force-Old-Origin == "1" && req.url.path ~ "^/version/?$") {
+    set req.backend = F_cname_find_eks_${environment}_govuk_digital;
+    set req.http.Fastly-Backend-Name = "origin";
+  } else {
+    unset req.http.X-Force-Old-Origin;
+  }
+
   # Asset retry from EKS. ECS retries land on EKS by default
   if (req.restarts == 0) {
     unset req.http.X-Retry-New-Origin;
@@ -207,7 +215,7 @@ sub vcl_recv {
     return(pass);
   }
 %{ if new_origin_enabled ~}
-  if (req.http.X-Force-New-Origin) {
+  if (req.http.X-Force-New-Origin || req.http.X-Force-Old-Origin) {
     return(pass);
   }
 %{ endif ~}
@@ -312,6 +320,7 @@ sub vcl_miss {
 %{ if new_origin_enabled ~}
 
   unset bereq.http.X-Retry-New-Origin;
+  unset bereq.http.X-Force-Old-Origin;
 
   if (req.backend == ${new_origin_backend}) {
     set bereq.http.X-Origin-Token = "${new_origin_token}";
@@ -373,6 +382,7 @@ sub vcl_pass {
 %{ if new_origin_enabled ~}
 
   unset bereq.http.X-Force-New-Origin;
+  unset bereq.http.X-Force-Old-Origin;
   unset bereq.http.X-Retry-New-Origin;
 
   if (req.backend == ${new_origin_backend}) {
